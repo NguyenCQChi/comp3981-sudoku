@@ -1,8 +1,9 @@
 import React from 'react';
+import LandingModule from '@containers/LandingModule';
 
 function index() {
   return (
-    <div>Index</div>
+    <LandingModule />
   )
 }
 
