@@ -36,7 +36,6 @@ function LandingModule() {
                 '&.MuiTableRow-root': {
                   border: '1px solid black',
                   borderTop: '5px solid black',
-                  // height: '30px'
                 }
               }
             } : 
