@@ -6,7 +6,8 @@ function LandingModule() {
   return (
     <div>Landing page
         
-    <SudokuGrid/>
+    <SudokuGrid
+      size={9}/>
 
     </div>
   )
