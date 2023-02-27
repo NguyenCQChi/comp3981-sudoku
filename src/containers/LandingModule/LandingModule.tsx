@@ -97,7 +97,8 @@ function LandingModule() {
           flexDirection: 'column', 
           flexWrap: 'wrap', 
           alignItems: 'center',
-          width: '18%'
+          width: '18%',
+          gap: '8px'
         }}>
           <MainButton title="Create" handleOnClick={handleCreate} option={false} />
           <MainButton title='Solve Brute Force' option={false} disable={true}/>
