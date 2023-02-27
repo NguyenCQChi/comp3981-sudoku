@@ -12,7 +12,7 @@ function LandingModule() {
   const [size, setSize] = useState("9x9");
   const [path, setPath] = useState("");
   const [isTxtFile, setIsTxtFile] = useState(true);
-  const { changeInitialBoard, initialBoard } = useContext(ResultContext);
+  const { changeInitialBoard } = useContext(ResultContext);
 
   const buttonStyle = {
     '&.MuiButton-root': {
@@ -39,10 +39,10 @@ function LandingModule() {
 
   function onChange(event: any) {
     event.preventDefault()
-    var file = event.target.files[0];
+    let file = event.target.files[0];
     if (file?.type == "text/plain") {
       setIsTxtFile(true)
-      var reader = new FileReader();
+      let reader = new FileReader();
       reader.onload = async function(event) {
         const fileData = event.target?.result;
         readFile(fileData);
@@ -55,11 +55,11 @@ function LandingModule() {
 
   async function readFile(fileData: any) {
     if (fileData !== undefined) {
-      var newData = fileData.split("\r\n")
-      var gridNums: any[] = [];
+      let newData = fileData.split("\r\n")
+      let gridNums: any[] = [];
       
-      var rows = newData.length;
-      var columns = newData[0].length;
+      let rows = newData.length;
+      let columns = newData[0].length;
 
       fill2DimensionsArray(gridNums, rows, columns);
 
@@ -73,9 +73,9 @@ function LandingModule() {
   }
 
   function fill2DimensionsArray(arr: any, rows: any, columns: any){
-    for (var i = 0; i < rows; i++) {
+    for (let i = 0; i < rows; i++) {
         arr.push([0])
-        for (var j = 0; j < columns; j++) {
+        for (let j = 0; j < columns; j++) {
             arr[i][j] = 0;
         }
     }
@@ -86,100 +86,103 @@ function LandingModule() {
   }, [size])
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', justifyItems: 'center', alignItems: 'center'}}>
-      <div style={{textAlign: 'center', padding: '3rem'}}>
-        <strong style={{fontSize: '4rem'}}>Welcome!</strong>
-      </div>
+    <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+      <div style={{display: 'flex', flexDirection: 'column', justifyItems: 'center', alignItems: 'center', width: '80%', height: '90%'}}>
+        <div style={{textAlign: 'center', padding: '3rem'}}>
+          <p style={{fontSize: '4rem', fontWeight: 700}}>Welcome!</p>
+        </div>
 
-      <div style={{
-        display: 'flex', 
-        flexDirection: 'column', 
-        flexWrap: 'wrap', 
-        alignItems: 'center',
-        width: '18%'
-      }}>
-      <MainButton title="Create" handleOnClick={handleCreate} option={false} />
-      <MainButton title='Solve Brute Force' option={false} disable={true}/>
-      <MainButton title ='Solve CSP' option={false} disable={true}/>
-      <MainButton title='Clear' option={false} disable={true}/>
-      <MainButton title='Exit' option={false}/>
+        <div style={{
+          display: 'flex', 
+          flexDirection: 'column', 
+          flexWrap: 'wrap', 
+          alignItems: 'center',
+          width: '18%',
+          gap: '8px'
+        }}>
+          <MainButton title="Create" handleOnClick={handleCreate} option={false} />
+          <MainButton title='Solve Brute Force' option={false} disable={true}/>
+          <MainButton title ='Solve CSP' option={false} disable={true}/>
+          <MainButton title='Clear' option={false} disable={true}/>
+          <MainButton title='Exit' option={false}/>
 
-      <Modal
-        open={openCreate}
-        onClose={handleCreate}
-        sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-      >
-        <Box 
-          sx={{
-            width: 400, 
-            height: 400,
-            bgcolor: 'background.paper', 
-            border: '5px solid black',
-            display: 'flex',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            alignItems: 'center'
-          }}
-        >
-          <div style={{width: '80%'}}>
-            {!openComGenerator && !openSelectFile ? 
-            (
-              <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-                <p style={{fontSize: '1.5rem'}}>Select an Option:</p>
-                <div style={{display: 'flex', flexDirection: 'column', width: '80%', gap: '10px'}}>
-                  <MainButton title='Select a Text File' option={true} handleOnClick={handleSelectFile} />
-                  <MainButton title='Computer Generate' option={true} handleOnClick={handleComputerGenerate}/>
-                </div>
-              </div>
-            ) : (
-              openComGenerator ? (
-                <div>
-                <List
-                  subheader={<ListSubheader sx={{'&.MuiListSubheader-root': {fontSize: '1.5rem'}, textAlign: 'center'}} component="div" >Select a Size: </ListSubheader>}
-                />
-                  <ListItemButton key={"9x9"} onClick={() => setSize("9x9")}><ListItemText sx={{textAlign: 'center'}} primary="9 x 9"></ListItemText></ListItemButton>
-                  <ListItemButton key={"12x12"} onClick={() => setSize("12x12")}><ListItemText sx={{textAlign: 'center'}} primary="12 x 12"></ListItemText></ListItemButton>
-                  <ListItemButton key={"16x16"} onClick={() => setSize("16x16")}><ListItemText sx={{textAlign: 'center'}} primary="16 x 16"></ListItemText></ListItemButton>
-                  <ListItemButton key={"25x25"} onClick={() => setSize("25x25")}><ListItemText sx={{textAlign: 'center'}} primary="25 x 25"></ListItemText></ListItemButton>
-                  <ListItemButton key={"100x100"} onClick={() => setSize("100x100")}><ListItemText sx={{textAlign: 'center'}} primary="100 x 100"></ListItemText></ListItemButton>
-                <Link
-                  href={path}
-                >
-                  <a style={{textDecoration: 'none'}}>
-                    <MainButton title='Submit'/>
-                  </a>
-                </Link>
-              </div>
-              ) : (
-                <div style={{display: 'flex', flexDirection: 'column', textAlign: 'center', alignContent: 'center'}}>
-                  <p style={{fontSize: '1.5rem'}}>Enter Path:</p>
-                  <Box
-                    sx={{
-                      bgcolor: 'grey',
-                      marginBottom: '10px' 
-                    }}
-                  >
-                    <div style={{display: 'flex', alignItems: 'center', width: '100%', margin: '10px'}}>
-                      <input type = "file" id = "input" onChange={onChange}/>
+          <Modal
+            open={openCreate}
+            onClose={handleCreate}
+            sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+          >
+            <Box 
+              sx={{
+                width: 400, 
+                height: 400,
+                bgcolor: 'background.paper', 
+                border: '5px solid black',
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}
+            >
+              <div style={{width: '80%'}}>
+                {!openComGenerator && !openSelectFile ? 
+                (
+                  <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+                    <p style={{fontSize: '1.5rem'}}>Select an Option:</p>
+                    <div style={{display: 'flex', flexDirection: 'column', width: '80%', gap: '10px'}}>
+                      <MainButton title='Select a Text File' option={true} handleOnClick={handleSelectFile} />
+                      <MainButton title='Computer Generate' option={true} handleOnClick={handleComputerGenerate}/>
                     </div>
-                  </Box>
-                  {!isTxtFile && <p style={{color: 'red'}} >Error!</p>}
-                  <div style={{width: '100%'}}>
+                  </div>
+                ) : (
+                  openComGenerator ? (
+                    <div>
+                    <List
+                      subheader={<ListSubheader sx={{'&.MuiListSubheader-root': {fontSize: '1.5rem'}, textAlign: 'center'}} component="div" >Select a Size: </ListSubheader>}
+                    />
+                      <ListItemButton key={"9x9"} onClick={() => setSize("9x9")}><ListItemText sx={{textAlign: 'center'}} primary="9 x 9"></ListItemText></ListItemButton>
+                      <ListItemButton key={"12x12"} onClick={() => setSize("12x12")}><ListItemText sx={{textAlign: 'center'}} primary="12 x 12"></ListItemText></ListItemButton>
+                      <ListItemButton key={"16x16"} onClick={() => setSize("16x16")}><ListItemText sx={{textAlign: 'center'}} primary="16 x 16"></ListItemText></ListItemButton>
+                      <ListItemButton key={"25x25"} onClick={() => setSize("25x25")}><ListItemText sx={{textAlign: 'center'}} primary="25 x 25"></ListItemText></ListItemButton>
+                      <ListItemButton key={"100x100"} onClick={() => setSize("100x100")}><ListItemText sx={{textAlign: 'center'}} primary="100 x 100"></ListItemText></ListItemButton>
                     <Link
-                      href={isTxtFile ? path : '/'}
+                      href={path}
                     >
                       <a style={{textDecoration: 'none'}}>
-                        <Button variant="outlined" color="inherit" sx={buttonStyle} disabled={!isTxtFile}>Submit</Button>
+                        <MainButton title='Submit'/>
                       </a>
                     </Link>
                   </div>
-                </div>
-              )
-            )}
-          </div>
-        </Box>
-      </Modal>
-    </div>
+                  ) : (
+                    <div style={{display: 'flex', flexDirection: 'column', textAlign: 'center', alignContent: 'center'}}>
+                      <p style={{fontSize: '1.5rem'}}>Enter Path:</p>
+                      <Box
+                        sx={{
+                          bgcolor: 'grey',
+                          marginBottom: '10px' 
+                        }}
+                      >
+                        <div style={{display: 'flex', alignItems: 'center', width: '100%', margin: '10px'}}>
+                          <input type = "file" id = "input" onChange={onChange}/>
+                        </div>
+                      </Box>
+                      {!isTxtFile && <p style={{color: 'red'}} >Error!</p>}
+                      <div style={{width: '100%'}}>
+                        <Link
+                          href={isTxtFile ? path : '/'}
+                        >
+                          <a style={{textDecoration: 'none'}}>
+                            <Button variant="outlined" color="inherit" sx={buttonStyle} disabled={!isTxtFile}>Submit</Button>
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            </Box>
+          </Modal>
+        </div>
+      </div>
 
     </div>
   )
