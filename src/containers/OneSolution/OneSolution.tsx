@@ -23,19 +23,19 @@ const OneSolution = (props: any) => {
 
   const handleSolveBF = () => {
     setOpenSolveBF(true)
-    changeResultBF([1,2,3])
+    // changeResultBF([1,2,3])
     changeTimeBF('100ms')
     if (openSolveCSP) {
-      changeResultCSP([4,5,6])
+      // changeResultCSP([4,5,6])
     }
   }
 
   const handleSolveCSP = () => {
     setOpenSolveCSP(true)
-    changeResultCSP([4,5,6])
+    // changeResultCSP([4,5,6])
     changeTimeCSP('20ms')
     if (openSolveBF) {
-      changeResultBF([1,2,3])
+      // changeResultBF([1,2,3])
     }
   }
 
@@ -81,6 +81,7 @@ const OneSolution = (props: any) => {
         <SudokuGrid
           size={size}
           gridNums={initialBoard}
+          solved={openSolveBF || openSolveCSP}
           />
         {openSolveBF && !openSolveCSP && 
           <div>
