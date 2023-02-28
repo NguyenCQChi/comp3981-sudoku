@@ -13,7 +13,7 @@ const TwoSolutions = ({size}: {size: String}) => {
   return(
     <div style={{display: 'flex', justifyContent: 'center', gap: '1rem'}}>
       <div>
-        <SudokuGrid size={size}/>
+        <SudokuGrid size={size} solved={resultBF.length > 0}/>
         <div>
             <p>Solved Brute Force!</p>
             <p>Time spent: {timeBF}</p>
@@ -32,7 +32,7 @@ const TwoSolutions = ({size}: {size: String}) => {
         <MainButton title='Exit' option={false}/>
       </div>
       <div>
-      <SudokuGrid size={size}/>
+      <SudokuGrid size={size} solved={resultCSP.length > 0}/>
         <div>
             <p>Solved CSP!</p>
             <p>Time spent: {timeCSP}</p>
