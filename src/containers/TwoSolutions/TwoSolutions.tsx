@@ -28,8 +28,11 @@ const TwoSolutions = ({size}: {size: String}) => {
             <MainButton title='Clear' option={false} disable={true}/>
           </a>
         </Link>
-        
-        <MainButton title='Exit' option={false}/>
+        <Link href='/exit'>
+          <a style={{textDecoration: 'none', width: "100%"}}>
+            <MainButton title='Exit' option={false}/>
+          </a>
+      </Link>
       </div>
       <div>
       <SudokuGrid size={size} solved={resultCSP.length > 0}/>

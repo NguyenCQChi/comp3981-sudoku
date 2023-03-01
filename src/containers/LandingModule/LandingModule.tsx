@@ -97,14 +97,17 @@ function LandingModule() {
           flexDirection: 'column', 
           flexWrap: 'wrap', 
           alignItems: 'center',
-          width: '18%',
-          gap: '8px'
+          width: '18%'
         }}>
           <MainButton title="Create" handleOnClick={handleCreate} option={false} />
           <MainButton title='Solve Brute Force' option={false} disable={true}/>
           <MainButton title ='Solve CSP' option={false} disable={true}/>
           <MainButton title='Clear' option={false} disable={true}/>
-          <MainButton title='Exit' option={false}/>
+          <Link href='/exit'>
+            <a style={{textDecoration: 'none', width: "100%"}}>
+              <MainButton title='Exit' option={false}/>
+            </a>
+          </Link>
 
           <Modal
             open={openCreate}
@@ -114,7 +117,7 @@ function LandingModule() {
             <Box 
               sx={{
                 width: 400, 
-                height: 400,
+                height: "wrapContent",
                 bgcolor: 'background.paper', 
                 border: '5px solid black',
                 display: 'flex',
@@ -135,23 +138,23 @@ function LandingModule() {
                   </div>
                 ) : (
                   openComGenerator ? (
-                    <div>
-                    <List
-                      subheader={<ListSubheader sx={{'&.MuiListSubheader-root': {fontSize: '1.5rem'}, textAlign: 'center'}} component="div" >Select a Size: </ListSubheader>}
-                    />
-                      <ListItemButton key={"9x9"} onClick={() => setSize("9x9")}><ListItemText sx={{textAlign: 'center'}} primary="9 x 9"></ListItemText></ListItemButton>
-                      <ListItemButton key={"12x12"} onClick={() => setSize("12x12")}><ListItemText sx={{textAlign: 'center'}} primary="12 x 12"></ListItemText></ListItemButton>
-                      <ListItemButton key={"16x16"} onClick={() => setSize("16x16")}><ListItemText sx={{textAlign: 'center'}} primary="16 x 16"></ListItemText></ListItemButton>
-                      <ListItemButton key={"25x25"} onClick={() => setSize("25x25")}><ListItemText sx={{textAlign: 'center'}} primary="25 x 25"></ListItemText></ListItemButton>
-                      <ListItemButton key={"100x100"} onClick={() => setSize("100x100")}><ListItemText sx={{textAlign: 'center'}} primary="100 x 100"></ListItemText></ListItemButton>
-                    <Link
-                      href={path}
-                    >
-                      <a style={{textDecoration: 'none'}}>
-                        <MainButton title='Submit'/>
-                      </a>
-                    </Link>
-                  </div>
+                    <div style={{gap: '10px', display: 'flex', flexDirection: 'column'}}>
+                      <List
+                        subheader={<ListSubheader sx={{'&.MuiListSubheader-root': {fontSize: '1.5rem'}, textAlign: 'center'}} component="div" >Select a Size: </ListSubheader>}
+                      />
+                        <ListItemButton sx={{'&.Mui-selected': { backgroundColor: "lightblue"}}} key={"9x9"} onClick={() => setSize("9x9")} selected={size == "9x9"}><ListItemText sx={{textAlign: 'center'}} primary="9 x 9"></ListItemText></ListItemButton>
+                        <ListItemButton key={"12x12"} onClick={() => setSize("12x12")} selected={size == "12x12"} sx={{'&.Mui-selected': {backgroundColor: "lightblue"}}}><ListItemText sx={{textAlign: 'center'}} primary="12 x 12" /></ListItemButton>
+                        <ListItemButton sx={{'&.Mui-selected': { backgroundColor: "lightblue"}}} key={"16x16"} onClick={() => setSize("16x16")} selected={size == "16x16"}><ListItemText sx={{textAlign: 'center'}} primary="16 x 16"></ListItemText></ListItemButton>
+                        <ListItemButton sx={{'&.Mui-selected': { backgroundColor: "lightblue"}}} key={"25x25"} onClick={() => setSize("25x25")} selected={size == "25x25"}><ListItemText sx={{textAlign: 'center'}} primary="25 x 25"></ListItemText></ListItemButton>
+                        <ListItemButton sx={{'&.Mui-selected': { backgroundColor: "lightblue"}}} key={"100x100"} onClick={() => setSize("100x100")} selected={size == "100x100"}><ListItemText sx={{textAlign: 'center'}} primary="100 x 100"></ListItemText></ListItemButton>
+                      <Link
+                        href={path}
+                      >
+                        <a style={{textDecoration: 'none'}}>
+                          <MainButton title='Submit'/>
+                        </a>
+                      </Link>
+                    </div>
                   ) : (
                     <div style={{display: 'flex', flexDirection: 'column', textAlign: 'center', alignContent: 'center'}}>
                       <p style={{fontSize: '1.5rem'}}>Enter Path:</p>
@@ -165,25 +168,25 @@ function LandingModule() {
                           <input type = "file" id = "input" onChange={onChange}/>
                         </div>
                       </Box>
-                      {!isTxtFile && <p style={{color: 'red'}} >Error!</p>}
-                      <div style={{width: '100%'}}>
-                        <Link
-                          href={isTxtFile ? path : '/'}
-                        >
-                          <a style={{textDecoration: 'none'}}>
-                            <Button variant="outlined" color="inherit" sx={buttonStyle} disabled={!isTxtFile}>Submit</Button>
-                          </a>
-                        </Link>
+                        {!isTxtFile && <p style={{color: 'red'}} >Error!</p>}
+                        <div style={{width: '100%'}}>
+                          <Link
+                            href={isTxtFile ? path : '/'}
+                          >
+                            <a style={{textDecoration: 'none'}}>
+                              <Button variant="outlined" color="inherit" sx={buttonStyle} disabled={!isTxtFile}>Submit</Button>
+                            </a>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
+                    )
                   )
-                )}
+                }
               </div>
             </Box>
           </Modal>
         </div>
       </div>
-
     </div>
   )
 }

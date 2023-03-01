@@ -51,7 +51,7 @@ const OneSolution = (props: any) => {
             <MainButton title='Solve Brute Force' handleOnClick={handleSolveBF} option={false} disable={true}/>
           ) : (
             <Link href={path}>
-              <a>
+              <a style={{textDecoration: 'none'}}>
                 <MainButton title='Solve Brute Force' handleOnClick={handleSolveBF} option={false} disable={openSolveBF}/>
               </a>
           </Link>
@@ -62,7 +62,7 @@ const OneSolution = (props: any) => {
         
         {openSolveBF ? (
             <Link href={path}>
-              <a><MainButton title ='Solve CSP' handleOnClick={handleSolveCSP} option={false} disable={openSolveCSP}/></a>
+              <a style={{textDecoration: 'none'}}><MainButton title ='Solve CSP' handleOnClick={handleSolveCSP} option={false} disable={openSolveCSP}/></a>
             </Link>
           ) : (
             <MainButton title ='Solve CSP' handleOnClick={handleSolveCSP} option={false} disable={openSolveCSP}/>
@@ -73,9 +73,11 @@ const OneSolution = (props: any) => {
             <MainButton title='Clear' option={false} disable={true}/>
           </a>
         </Link>
-        
-        
-        <MainButton title='Exit' option={false}/>
+        <Link href='/exit'>
+          <a style={{textDecoration: 'none', width: "100%"}}>
+            <MainButton title='Exit' option={false}/>
+          </a>
+      </Link>
       </div>
       <div>
         <SudokuGrid
