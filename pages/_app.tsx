@@ -1,7 +1,7 @@
 import '@styles/style.css';
 import { ResultProvider } from "@src/contexts/ResultContext"
 import { theme } from '@styles/index';
-import { ThemeProvider } from '@emotion/react';
+import { ThemeProvider } from '@mui/material/styles';
 
 function MyApp({ Component, pageProps } : { Component: any, pageProps: any}) {
   return(

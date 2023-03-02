@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {Table, TableCell, TableRow, TableBody} from "@mui/material";
 import { ResultContext } from '@src/contexts/ResultContext';
 const SudokuGrid = (props: any) => {
@@ -14,13 +14,8 @@ const SudokuGrid = (props: any) => {
   const { 
     changeResultBF, 
     changeResultCSP,
-    changeTimeBF, 
-    changeTimeCSP, 
-    resultBF, 
-    resultCSP, 
-    timeBF, 
-    timeCSP,
-    initialBoard } = useContext(ResultContext);
+    resultCSP
+  } = useContext(ResultContext);
 
   const solvedNineByNine = [
     [4,3,5,2,6,9,7,8,1],
@@ -255,7 +250,7 @@ const SudokuGrid = (props: any) => {
     } else {
       setGridBoard(gridNums)
     }
-  }, [solved])
+  }, [])
 
   return (
     <Table
@@ -295,9 +290,6 @@ const SudokuGrid = (props: any) => {
                         border: '1px solid black',
                         borderLeft: '3px solid black',
                         padding: '0'
-                        // maxWidth: '20px',
-                        // maxHeight: '20px'
-
                       }
                     }
                   } : 
