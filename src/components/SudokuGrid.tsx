@@ -2,12 +2,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {Table, TableCell, TableRow, TableBody} from "@mui/material";
 import { ResultContext } from '@src/contexts/ResultContext';
+import { useTheme } from '@mui/material/styles';
 const SudokuGrid = (props: any) => {
   const {
     size,
     gridNums,
     solved = false 
   } = props;
+  const theme = useTheme();
   const [columnLine, setColumnLine] = useState(3)
   const [rowLine, setRowLine] = useState(3)
   const [gridBoard, setGridBoard] = useState<any>([[]]);
@@ -28,7 +30,6 @@ const SudokuGrid = (props: any) => {
     [2,4,8,9,5,7,1,3,6],
     [7,6,3,4,1,8,2,5,9]
   ]
-
   const solvedTwelveByTwelve = [
     [7,10,5,4,8,12,3,9,1,6,11,2],
     [2,3,1,11,4,6,5,10,12,8,7,9],
@@ -193,7 +194,7 @@ const SudokuGrid = (props: any) => {
 
   // removes 25% of the numbers-
   function createBlanks(gridBoard: any) {
-    var unsolvedNineByNine = structuredClone(gridBoard)
+    let unsolvedNineByNine = structuredClone(gridBoard)
     let numTilesToRemove = Math.floor((size * size) * 0.75)
     let removedCells: any = []
 
@@ -250,61 +251,39 @@ const SudokuGrid = (props: any) => {
     } else {
       setGridBoard(gridNums)
     }
-  }, [])
+  }, [solved])
 
   return (
     <Table
         sx={{
           '&.MuiTable-root': {
-            width: 'auto',
-            height: '100%'
+            width: '90%',
+            height: '90%',
           }
         }}
       >
         <TableBody>
           {gridBoard.map((col: any, position: any) => (
             <TableRow
-            {...(position % rowLine == 0 && position != 0) ? 
-              
-              {sx:{
-                '&.MuiTableRow-root': {
-                  border: '1px solid black',
-                  borderTop: '3px solid black',
-                }
-              }
-            } : 
-            {sx: {
-              '&.MuiTableCell-root': {
-                border: '1px solid black',
-              }
-            }}
-            }
-              key={col.field}
+              sx={{
+                border: `1px solid ${theme.palette.primary.dark}`,
+                borderTop: position % rowLine == 0 && position != 0 ? `3px solid ${theme.palette.primary.dark}` : ''
+              }}
+              key={position}
             >
               {gridBoard[position].map((column: any, key: any) => (
                 <TableCell 
-                  
-                  {...(key % columnLine == 0 && key != 0) ? 
-                    {sx:{
-                      '&.MuiTableCell-root': {
-                        border: '1px solid black',
-                        borderLeft: '3px solid black',
-                        padding: '0'
-                      }
-                    }
-                  } : 
-                  {sx: {
-                    '&.MuiTableCell-root': {
-                      border: '1px solid black',
-                      padding: '0'
-                    }
+                  key={key}
+                  sx={{
+                    border: `1px solid ${theme.palette.primary.dark}`,
+                    padding: '0',
+                    borderLeft: key % columnLine == 0 && key != 0 ? `3px solid ${theme.palette.primary.dark}` : '',
+                    width: size < 25 ? '50px' : '25px',
+                    height: size < 25 ? '50px' : '25px',
                   }}
-                  }
                 >
-                  <div 
-                  style={{width: '35px', height: '25px', textAlign: 'center'}}
-                  >{column == 0 ? '': column}</div>
-                  </TableCell>
+                  <div style={{width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: size <= 9 ? '20px' : '14px'}}>{column == 0 ? '': column}</div>
+                </TableCell>
               ))}
             </TableRow>
           ))}

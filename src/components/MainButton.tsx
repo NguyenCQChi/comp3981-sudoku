@@ -23,15 +23,16 @@ const MainButton = (props: any) => {
           width: '100%',
           textTransform: 'none',
           border: 'none',
-          boxShadow: '',
+          boxShadow: disable ? `0px 5px 5px ${theme.palette.secondary.dark}` : `0px 5px 5px ${theme.palette.primary.dark}`,
           ':hover': {
             backgroundColor: disable ? theme.palette.secondary.dark : theme.palette.primary.light,
             transitionProperty: 'transform',
             transform: 'translateY(-2px) translateX(2px)',
-            transitionDuration: '300ms'
+            transitionDuration: '300ms',
+            boxShadow: disable ? `0px 5px 5px ${theme.palette.secondary.dark}` : `0px 5px 5px ${theme.palette.primary.main}`
           },
           '&.Mui-disabled': {
-            color: 'white'
+            color: 'white' 
           },
           ...sx
         }}

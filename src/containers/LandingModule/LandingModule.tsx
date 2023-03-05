@@ -72,8 +72,8 @@ function LandingModule() {
   async function readFile(fileData: any) {
     if (fileData !== undefined) {
       let newData = fileData.split("\r\n")
-      let gridNums: any[] = [];
-      
+      let gridNums: any[] = []
+
       let rows = newData.length;
       let columns = newData[0].length;
 
