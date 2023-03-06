@@ -4,24 +4,40 @@ import MainButton from '@src/components/MainButton';
 import Link from 'next/link';
 import { ResultContext } from '@src/contexts/ResultContext';
 import { useTheme } from '@mui/material/styles';
+import { bruteForce } from '@src/utils/brute-force';
+import { CircularProgress } from '@mui/material';
 
 const OneSolution = (props: any) => {
   const {
     size } = props;
   const theme = useTheme();
-  const [openSolveBF, setOpenSolveBF] = useState(false)
-  const [openSolveCSP, setOpenSolveCSP] = useState(false)
-  const path = `/twoSolutions/${size}`
   const { 
     changeTimeBF, 
     changeTimeCSP, 
     timeBF, 
     timeCSP,
+    changeResultBF,
     initialBoard } = useContext(ResultContext);
+  const [openSolveBF, setOpenSolveBF] = useState(false)
+  const [openSolveCSP, setOpenSolveCSP] = useState(false)
+  const [gridBoard, setGridBoard] = useState(initialBoard)
+  const [loading, setLoading] = useState(false)
+  const path = `/twoSolutions/${size}`
 
   const handleSolveBF = () => {
+    // setLoading(true)
+    var startTime = performance.now()
+    // bruteForce(gridBoard)
+    let result = bruteForce(gridBoard, 0, 0)
+    var endTime = performance.now()
+    console.log(result)
+    // setLoading(false)
+    var solveBFTime = endTime - startTime
+    changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
+    
     setOpenSolveBF(true)
-    changeTimeBF('100ms')
+    changeResultBF(gridBoard)
+    // setGridBoard(gridBoard)
   }
 
   const handleSolveCSP = () => {
@@ -30,6 +46,8 @@ const OneSolution = (props: any) => {
   }
 
   useEffect(() => {
+    setGridBoard(initialBoard)
+    // console.log(initialBoard)
     if(size == 100) {
       // @ts-ignore 
       const initialValue = document.body.style.zoom;
@@ -90,9 +108,10 @@ const OneSolution = (props: any) => {
         <div style={{width: '70%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <SudokuGrid
             size={size}
-            gridNums={initialBoard}
+            sudokuBoard={gridBoard}
             solved={openSolveBF || openSolveCSP}
             />
+            {loading && <CircularProgress />}
           {openSolveBF && !openSolveCSP && 
             <div>
               <p>Solved Brute Force!</p>

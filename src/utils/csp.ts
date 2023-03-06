@@ -1,0 +1,5 @@
+const CSP = () => {
+
+};
+
+export { CSP };
