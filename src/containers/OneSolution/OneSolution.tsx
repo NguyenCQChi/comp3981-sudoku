@@ -4,7 +4,7 @@ import MainButton from '@src/components/MainButton';
 import Link from 'next/link';
 import { ResultContext } from '@src/contexts/ResultContext';
 import { useTheme } from '@mui/material/styles';
-import { bruteForce } from '@src/utils/brute-force';
+import { stackBruteForce } from '@src/utils/brute-force';
 import { CircularProgress } from '@mui/material';
 
 const OneSolution = (props: any) => {
@@ -27,13 +27,19 @@ const OneSolution = (props: any) => {
   const handleSolveBF = () => {
     // setLoading(true)
     var startTime = performance.now()
+    // console.log("start " + startTime)
     // bruteForce(gridBoard)
-    let result = bruteForce(gridBoard, 0, 0)
+    stackBruteForce(gridBoard)
     var endTime = performance.now()
-    console.log(result)
-    // setLoading(false)
+    // console.log("end " + endTime)
     var solveBFTime = endTime - startTime
+    console.log(solveBFTime)
     changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
+    // if (solveBFTime > 1000) {
+    //   clearTimeout(timerId)
+    // }
+    // setLoading(false)
+    // changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
     
     setOpenSolveBF(true)
     changeResultBF(gridBoard)

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import {Table, TableCell, TableRow, TableBody} from "@mui/material";
 import { ResultContext } from '@src/contexts/ResultContext';
 import { useTheme } from '@mui/material/styles';
-import { bruteForce } from '@src/utils/brute-force';
+// import { bruteForce } from '@src/utils/brute-force';
 const SudokuGrid = (props: any) => {
   const {
     size,
@@ -20,8 +20,8 @@ const SudokuGrid = (props: any) => {
   } = useContext(ResultContext);
 
   useEffect(() => {
-    setRowLine(Math.ceil(Math.sqrt(size)))
-    setColumnLine(Math.floor(Math.sqrt(size)))
+    setRowLine(Math.floor(Math.sqrt(size)))
+    setColumnLine(Math.ceil(Math.sqrt(size)))
     setGridBoard(sudokuBoard)
     // console.log(sudokuBoard)
       // if (size == 12) {
