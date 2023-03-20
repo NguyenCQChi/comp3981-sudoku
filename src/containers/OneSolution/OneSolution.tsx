@@ -6,6 +6,7 @@ import { ResultContext } from '@src/contexts/ResultContext';
 import { useTheme } from '@mui/material/styles';
 import { stackBruteForce } from '@src/utils/brute-force';
 import { CircularProgress } from '@mui/material';
+import { CSP } from '@src/utils/csp';
 
 const OneSolution = (props: any) => {
   const {
@@ -47,6 +48,7 @@ const OneSolution = (props: any) => {
   }
 
   const handleSolveCSP = () => {
+    CSP(gridBoard)
     setOpenSolveCSP(true)
     changeTimeCSP('20ms')
   }
