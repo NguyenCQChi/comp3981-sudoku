@@ -1,13 +1,9 @@
 const CSP = (board: any) => {
-  // console.log("solving csp")
   const boardSize= board.length  
   let csp: never[] = []
-  let queue = getAllArcs(board)
+  var originalBoardDomains = getCellDomains(csp, board)
   let unassignedCells = getAllUnassigned(board)
-  // console.log(board)
-  
-  backtrack(csp, board, queue)
-  // console.log(board)
+  backtrack(csp, board, originalBoardDomains)
 };
 
 const getAllArcs = (board: any) => {
@@ -37,26 +33,36 @@ const getAllUnassigned = (board: any) => {
 }
 
 //n = size of board, c = 1-size of board (all the choices)
-const isValid = (board: any, row: number, col: number, n: number, c: any) => {
-  const smallBoxRow = Math.floor(Math.sqrt(n)) //3 flipped
-  const smallBoxCol = Math.ceil(Math.sqrt(n)) //4
-  const blockRow = Math.floor(row / smallBoxRow) * smallBoxRow;
-  const blockCol = Math.floor(col / smallBoxCol) * smallBoxCol;
-  for (let i = 0; i < n; i++) {
-    if (board[row][i] == c || board[i][col] == c) return false;
-    const curRow = blockRow + Math.floor(i / smallBoxRow);
-    const curCol = blockCol + Math.floor(i % smallBoxCol);
-    if (board[curRow][curCol] == c) return false;
+const isValid = (board: any, x: number, y: number, n: number, c: any) => {
+  const rowSize = Math.floor(Math.sqrt(n))
+  const colSize = Math.ceil(Math.sqrt(n))
+  let box = []
+  for (let i = 0; i < rowSize; i++) {
+    for (let j = 0; j < colSize; j++) {
+      box.push(board[(Math.floor(x / rowSize)*rowSize)+i][(Math.floor(y / colSize)*colSize)+j])
+    }
   }
-  return true;
+
+  let row = []
+  let col = []
+  for (let i = 0; i < n; i++) {
+    row.push(board[x][i])
+    col.push(board[i][y])
+  }
+
+  for (let i = 1; i <= n; i++) {
+    if (!row.includes(c) && !col.includes(c) && !box.includes(c)) {
+      return true;
+    }
+  }
+  return false;
 }
 
-function backtrack(csp: any, board: any, queue: any) {
+function backtrack(csp: any, board: any, boardDomains: any) {
   const completed = isBoardComplete(board)
   if (completed) {
     return true
   }
-  var boardDomains = getCellDomains(csp, board)
 
   // find which variable (cell) should be assigned next
   var unassignedCell = selectUnassignedVariable(csp, board, boardDomains)
@@ -66,47 +72,46 @@ function backtrack(csp: any, board: any, queue: any) {
   // order the values for which the variable should be tried (ie 1 or 9 or 5 or etc)
   var orderOfDomainValues = orderDomainValues(csp, unassignedCell, board, boardDomains) //map  
   var sortedDomainValues = sortOrderOfDomainValues(orderOfDomainValues)
-  // console.log("sortedDomainValues")
-  // sortedDomainValues.forEach((x)=> console.log(x))
 
-  //domainValue is not used, we just needed key in the mah {key=1:2}
+  //domainValue is not used, we just needed key in the map {key=1:2}
   sortedDomainValues.forEach((domainValue,key) => {
     if (isValid(board, row, col, board.length, key)) {
-      // console.log("BEFORE: Assigning " + key + " to row " + row + ", col " + col)
-      // console.log("board domains before:")
-      // boardDomains.forEach((d) => console.log(d))
       board[row][col] = key
-      var currentCellOldDomains = boardDomains[row][col]//note: currently shallow copy, might need a deep copy
+      let currentRow = row
+      let currentCol = col
+      // saves the original domain of newly assigned cell, ie [1, 2, 3, 4]
+      var currentCellOldDomains = structuredClone(boardDomains[row][col])//note: currently shallow copy, might need a deep copy
       
-      console.log("Assigning " + key + " to row " + row + ", col " + col)
-      boardDomains[row][col] = []
+      // console.log("Assigning " + key + " to row " + row + ", col " + col)
+      boardDomains[row][col] = [] 
+      // reassigns domain of newly assigned cell to length 1, ie [1]
       boardDomains[row][col].push(key)
-      // console.log("key: " + key)
-      // console.log("board domains of recently assigned cell: " + boardDomains[row][col])
-      // console.log("board domains after")
-      // boardDomains.forEach((d) => console.log(d))
-      let inferences = inference(csp, board, boardDomains, queue)
-      // console.log("inferences " + inferences)
+      let inferences = inference(csp, board, boardDomains)
   
       if (inferences) {
         csp.push(inferences)
-        let result = backtrack(csp, board, queue)
-        // console.log(result) //Check if a value has been added
+        let result = backtrack(csp, board, boardDomains)
         // if result does not equal failure, return result
         if (result) {//result != board
-          // return result
           return result
         }
         csp.pop(inferences)//!!!!!! needs to be fixed
       }
+      // reset all changes made
+      // reset current cell assignment back to 0
       board[row][col] = 0
+      // saves current cell's domain of length 1 ie [1]
       let currentCellNewDomain = boardDomains[row][col]
+      // saves originalBoardDomains, ie all cells have [1, 2, 3, 4]
+      let originalBoardDomains = getCellDomains(csp, board)
+      // set reassigned cell back to its original domain
       boardDomains[row][col] = currentCellOldDomains
-      let index = boardDomains[row][col].indexOf(currentCellNewDomain)
+      // get the index of the domain that didn't work, ie where is 1 in [1, 2, 3, 4]
+      let index = originalBoardDomains[row][col].indexOf(currentCellNewDomain[0])
+      // remove domain that didn't work from current cell's original domain
       boardDomains[row][col].splice(index, 1)
     }
   });
-  // return board
   return false
 }
 
@@ -142,33 +147,24 @@ const getNeighbors = (board: any, queue: any, row: any, col: any) => {
 }
 
 // AC-3 Algorithm
-const inference = (csp: any, board: any, boardDomains: any, queue: any) => {
-  // queue of initial arcs
-  let initialQueue: never[] = []
+const inference = (csp: any, board: any, boardDomains: any) => {
+  let queue = getAllArcs(board)
 
-  // console.log(queue.length)
   while (queue.length != 0) {
     let popped = queue.shift() //removes first item from queue
     if (popped != undefined) {
       var XiRow = popped[0]
       var XiCol = popped[1]
     }
-    if (revise(csp, popped, boardDomains)) {
-      
-      // console.log("XiRow: " + XiRow + " XiCol: " + XiCol + " num domains: " + boardDomains[XiRow][XiCol].length)
-      
-      // if (board[XiRow][XiCol] == 0 && boardDomains[XiRow][XiCol].length == 0) {
+    let revised = revise(csp, popped, boardDomains)
+    if (revised) {
       if (boardDomains[XiRow][XiCol].length == 0) {
-        // failure when  there is nothing left in the domain
+        // failure when there is nothing left in the domain
         return false
       }
       let initialNeighborsQueue: never[] = []
       let neighborsQueue = getNeighbors(board, initialNeighborsQueue, XiRow, XiCol)
-      // console.log("neighbors queue")
-      // neighborsQueue.forEach((q: any) => console.log(q));
       // neighborsQueue.pop([XjRow, XjCol, XiRow, XiCol])//<-- needs to be replaced
-      // console.log("neighbors queue")
-      // neighborsQueue.forEach((q: any) => console.log(q));
       queue = queue.concat(neighborsQueue)
     }
   }
@@ -188,41 +184,18 @@ const revise = (csp: any, popped: any, boardDomains: any) => {
   boardDomains[XiRow][XiCol].forEach((x: any) => {
     // if no value in Xj's domain allows (Di, Dj) to satisfy the constraint b/w Xi and Xj
     // Xi's domain = {1, 2, 3}, Xj's domain = {3}
-    // console.log("length: " + boardDomains[XjRow][XjCol].length)
-    // console.log(boardDomains[XjRow][XjCol])
     if (boardDomains[XjRow][XjCol].includes(x) && boardDomains[XjRow][XjCol].length == 1) { //Di {1,2,3} Dj{1,2,3,4}
-      // console.log(boardDomains[XjRow][XjCol])
-      // console.log(x)
-      // console.log("reducing domain")
-      console.log(boardDomains[XiRow][XiCol])
       let index = boardDomains[XiRow][XiCol].indexOf(x)
       boardDomains[XiRow][XiCol].splice(index, 1)
-      console.log(boardDomains[XiRow][XiCol])
       revised = true
     }
-    // boardDomains[XjRow][XjCol].forEach((Dj: any) => {
-    //   // console.log("Dj: " + Dj + " Di: " + Di)
-    //   if (Dj == Di) {
-    //     satisfiesConstraint = false
-    //   } else {
-    //     satisfiesConstraint = true
-    //   }
-    // }); 
-    // if (!satisfiesConstraint) {
-    //   let index = boardDomains[XiRow][XiCol].indexOf(Di)
-    //   boardDomains[XiRow][XiCol].splice(index, 1)
-    //   revised = true
-    // }
   });
   return revised;
 }
 
-
 //sorts domain values from lowest to highest
 const sortOrderOfDomainValues = (orderDomainValues: any) => {
   const sorted = new Map([...orderDomainValues.entries()].sort((a, b) => a[1] - b[1]))
-  // console.log("sorted order of domain values")
-  // console.log(sorted)
   return sorted
 }
 
@@ -346,11 +319,15 @@ const getCellDomains = (csp: any, board: any) => {
       if (board[i][j] == 0) {
         let reducedDomain = reduceDomain(board, i, j) 
         domainBoard[i][j] = domainBoard[i][j].filter((n: number) => !reducedDomain.has(n))
+        if (domainBoard[i][j].length == 1) {
+          board[i][j] = domainBoard[i][j][0]
+        }
       } else {
         domainBoard[i][j] = [board[i][j]]
       }
     }
   }
+  let cellDomains = domainBoard
   return domainBoard
 }
 
