@@ -18,6 +18,7 @@ const OneSolution = (props: any) => {
     timeBF, 
     timeCSP,
     changeResultBF,
+    changeResultCSP,
     initialBoard } = useContext(ResultContext);
   const [openSolveBF, setOpenSolveBF] = useState(false)
   const [openSolveCSP, setOpenSolveCSP] = useState(false)
@@ -27,13 +28,13 @@ const OneSolution = (props: any) => {
 
   const handleSolveBF = () => {
     // setLoading(true)
-    var startTime = performance.now()
+    let startTime = performance.now()
     // console.log("start " + startTime)
     // bruteForce(gridBoard)
     stackBruteForce(gridBoard)
-    var endTime = performance.now()
+    let endTime = performance.now()
     // console.log("end " + endTime)
-    var solveBFTime = endTime - startTime
+    let solveBFTime = endTime - startTime
     console.log(solveBFTime)
     changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
     // if (solveBFTime > 1000) {
@@ -48,9 +49,13 @@ const OneSolution = (props: any) => {
   }
 
   const handleSolveCSP = () => {
+    let startTime = performance.now()
     CSP(gridBoard)
+    let endTime = performance.now()
+    let solveCSPTime = endTime - startTime
+    changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
     setOpenSolveCSP(true)
-    changeTimeCSP('20ms')
+    changeResultCSP(gridBoard)
   }
 
   useEffect(() => {

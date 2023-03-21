@@ -1,12 +1,30 @@
 const CSP = (board: any) => {
   // console.log("solving csp")
   const boardSize= board.length  
-  let csp: boolean[] = []
+  let csp: never[] = []
+  let unassignedCells = getAllUnassigned(board)
+  // unassignedCells.forEach((row, col) => {
+  //   backtrack(csp, board)
+  // });
+  console.log(board)
   backtrack(csp, board)
+  // console.log(board)
 };
 
+const getAllUnassigned = (board: any) => {
+  let allUnassignedCells = []
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board.length; j++) {
+      if (board[i][j] == 0) {
+        allUnassignedCells.push([i, j])
+      }
+    }
+  }
+  return allUnassignedCells
+}
+
 //n = size of board, c = 1-size of board (all the choices)
-const isValid = (board: any, row: number, col: number, n: number, c: number) => {
+const isValid = (board: any, row: number, col: number, n: number, c: any) => {
   const smallBoxRow = Math.floor(Math.sqrt(n)) //3 flipped
   // console.log(smallBoxRow)
   const smallBoxCol = Math.ceil(Math.sqrt(n)) //4
@@ -42,32 +60,38 @@ function backtrack(csp: any, board: any) {
   var sortedDomainValues = sortOrderOfDomainValues(orderOfDomainValues)
 
   sortedDomainValues.forEach((domainValue,key) => {
-    board[row][col] = key
-    //
-    //
-    // DEBUG FROM HEREEEEEEEE!!!!!!!
-    //
-    //
-    //
-    //
-    let inferences = inference(csp, unassignedCell, board, boardDomains)
-
-    if (!inferences) {
-      csp.push(inferences)
-      let result = backtrack(csp, board)
-      // if result does not equal failure, return result
-      if (result != board) {
-        return result
+    if (isValid(board, row, col, board.length, key)) {
+      board[row][col] = key
+      var currentCellOldDomains = boardDomains[row][col]//note: might need to use a different copy
+      boardDomains[row][col] = [key]
+      console.log("Assigning " + key + " to row " + row + ", col " + col)
+      let inferences = inference(csp, unassignedCell, board, boardDomains)
+      console.log("inferences " + inferences)
+  
+      if (inferences) {
+        // console.log("inferences is true")
+        csp.push(inferences)
+        let result = backtrack(csp, board)
+        console.log(result) //Check if a value has been added
+        // if result does not equal failure, return result
+        if (isBoardComplete(result)) {//result != board
+          return result
+        }
+        csp.pop(inferences)
       }
-      csp.pop(inferences)
+      board[row][col] = 0
+      let currentCellNewDomain = boardDomains[row][col]
+      boardDomains[row][col] = currentCellOldDomains
+      let index = boardDomains[row][col].indexOf(currentCellNewDomain)
+      boardDomains[row][col].splice(index, 1)
     }
-    board[row][col] = 0
   });
+  // console.log(board)
   return board
 }
 
 const getNeighbors = (board: any, queue: any, row: any, col: any) => {
-
+  
   for (let i = 0; i < board.length; i++) {
     if (board[row][i] == 0 && i != col) {
       // Xi = row, i 
@@ -97,36 +121,48 @@ const getNeighbors = (board: any, queue: any, row: any, col: any) => {
   return queue
 }
 
+// const inference = (csp: any, unassignedCell: any, board: any, boardDomains: any) => {
+//   let row = unassignedCell[0]
+//   let col = unassignedCell[1]
+
+// }
+
 // AC-3 Algorithm
 const inference = (csp: any, unassignedCell: any, board: any, boardDomains: any) => {
   // queue of initial arcs
   let initialQueue: never[] = []
-
   let row = unassignedCell[0]
   let col = unassignedCell[1]
 
   let queue = getNeighbors(board, initialQueue, row, col)
-
-  // console.log("row: " + unassignedCell[0])
-  // console.log("col: " + unassignedCell[1])
+  // console.log("initial queue")
+  // console.log(typeof(queue))
+  // console.log(queue)
 
   while (queue.length != 0) {
-    let popped = queue.shift()
+    // console.log("queue in while loop")
+    // queue.forEach((q: any) => console.log(q));
+    let popped = queue.shift() //removes first item from queue
     if (popped != undefined) {
       var XiRow = popped[0]
       var XiCol = popped[1]
-      var XjRow = popped[2]
-      var XjCol = popped[3]
     }
     if (revise(csp, popped, boardDomains)) {
-      if (board[XiRow][XiCol] == 0 && boardDomains[XiRow][XiCol].length == 0) {
+      console.log("XiRow: " + XiRow + " XiCol: " + XiCol + " num domains: " + boardDomains[XiRow][XiCol].length)
+      
+      // if (board[XiRow][XiCol] == 0 && boardDomains[XiRow][XiCol].length == 0) {
+      if (boardDomains[XiRow][XiCol].length == 0) {
         // failure when  there is nothing left in the domain
         return false
       }
       let initialNeighborsQueue: never[] = []
       let neighborsQueue = getNeighbors(board, initialNeighborsQueue, XiRow, XiCol)
-      neighborsQueue.pop([XjRow, XjCol, XiRow, XiCol])
-      neighborsQueue.forEach((XkRow: any, XkCol: any, XiRow: any, XiCol: any) => queue.push([XkRow, XkCol, XiRow, XiCol]));
+      // console.log("neighbors queue")
+      // neighborsQueue.forEach((q: any) => console.log(q));
+      // neighborsQueue.pop([XjRow, XjCol, XiRow, XiCol])//<-- needs to be replaced
+      // console.log("neighbors queue")
+      // neighborsQueue.forEach((q: any) => console.log(q));
+      queue = queue.concat(neighborsQueue)
     }
   }
   return true
@@ -140,15 +176,33 @@ const revise = (csp: any, popped: any, boardDomains: any) => {
   let XjRow = popped[2]
   let XjCol = popped[3]
   let satisfiesConstraint = true
-  boardDomains[XiRow][XiCol].forEach((Di: any) => {
-    boardDomains[XjRow][XjCol].forEach((Dj: any) => {
-      if (Dj == Di) {
-        satisfiesConstraint = false
-      }}); 
-    if (satisfiesConstraint) {
-      boardDomains[XiRow][XiCol].pop(Di)
+  console.log("board domains")
+  console.log(boardDomains)
+  // console.log("popped")
+  // console.log(popped)
+  boardDomains[XiRow][XiCol].forEach((x: any) => {
+    // if no value in Xj's domain allows (Di, Dj) to satisfy the constraint b/w Xi and Xj
+    // Xi's domain = {1, 2, 3}, Xj's domain = {1, 2, 3}
+    if (!boardDomains[XjRow][XjCol].includes(x) && boardDomains[XjRow][XjCol].length == 1) { //Di {1,2,3} Dj{1,2,3,4}
+      let index = boardDomains[XiRow][XiCol].indexOf(x)
+      boardDomains[XiRow][XiCol].splice(index, 1)
       revised = true
     }
+
+
+    // boardDomains[XjRow][XjCol].forEach((Dj: any) => {
+    //   // console.log("Dj: " + Dj + " Di: " + Di)
+    //   if (Dj == Di) {
+    //     satisfiesConstraint = false
+    //   } else {
+    //     satisfiesConstraint = true
+    //   }
+    // }); 
+    // if (!satisfiesConstraint) {
+    //   let index = boardDomains[XiRow][XiCol].indexOf(Di)
+    //   boardDomains[XiRow][XiCol].splice(index, 1)
+    //   revised = true
+    // }
   });
   return revised;
 }
@@ -163,11 +217,11 @@ const sortOrderOfDomainValues = (orderDomainValues: any) => {
 const orderDomainValues = (csp: any, unassignedCell: any, board: any, boardDomains: any) => {
   let row = unassignedCell[0]
   let col = unassignedCell[1]
-  console.log("row: " + unassignedCell[0])
-  console.log("col: " + unassignedCell[1])
+  // console.log("row: " + unassignedCell[0])
+  // console.log("col: " + unassignedCell[1])
 
   let sortedDomainValues = new Map()
-  console.log(boardDomains)
+  // console.log(boardDomains)
   boardDomains[row][col].forEach((d: any) => sortedDomainValues.set(d, 0)) //ex. [1:0, 2:0, 3:0, 8:0]
 
   // console.log("initial domain values of first cell")
@@ -274,7 +328,7 @@ const getDegree = (board: any, row: any, col: any) => {
       }
     }
   }
-  console.log(numAffectedDomains)
+  // console.log(numAffectedDomains)
   return numAffectedDomains.length
 }
 
@@ -290,7 +344,7 @@ const getCellDomains = (csp: any, board: any) => {
         let reducedDomain = reduceDomain(board, i, j) 
         domainBoard[i][j] = domainBoard[i][j].filter((n: number) => !reducedDomain.has(n))
       } else {
-        domainBoard[i][j] = 0
+        domainBoard[i][j] = [board[i][j]]
       }
     }
   }
@@ -353,7 +407,6 @@ const getNumbersInSameBox = (board: any, row: number, col: number) => {
 
 //checks if board is complete (aka if there is something assigned in every cell)
 const isBoardComplete = (board: any) => {
-  var finished = false
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board.length; j++) {
       if (board[i][j] == 0) {

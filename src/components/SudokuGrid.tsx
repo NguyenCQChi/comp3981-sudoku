@@ -62,7 +62,7 @@ const SudokuGrid = (props: any) => {
     //   }
     // } else {
     
-  }, [solved, resultBF])
+  }, [solved, resultBF, resultCSP])
 
   return (
     <Table
