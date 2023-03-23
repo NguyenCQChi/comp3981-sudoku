@@ -60,33 +60,59 @@ function backtrack(csp: any, board: any, boardDomains: any) {
   // order the values for which the variable should be tried (ie 1 or 9 or 5 or etc)
   var orderOfDomainValues = orderDomainValues(csp, unassignedCell, board, boardDomains) //map  
   var sortedDomainValues = sortOrderOfDomainValues(orderOfDomainValues)
-
+  
   //domainValue is not used, we just needed key in the map {key=1:2}
   sortedDomainValues.forEach((domainValue,key) => {
     // const currentIterationBoardDomains = boardDomains
+    var changedBoardDomains: any[] = []
     if (isValid(board, row, col, board.length, key)) {
+      //bvoard domains here 
+      
       board[row][col] = key
+      // !!!!!!!!!!!! check if complete and return here? new!!!!
+      // if (isBoardComplete(board)) {
+      //   console.log("second board complete returned true")
+      //   return true
+      // }
       let currentRow = row
       let currentCol = col
       // saves the original domain of newly assigned cell, ie [1, 2, 3, 4]
       const currentCellOldDomains = structuredClone(boardDomains[row][col])
       console.log("Assigning " + key + " to row " + row + ", col " + col)
+      
+      //currentCellOldDomains lenght = 1
+      changedBoardDomains.push([row, col, currentCellOldDomains.filter((n: any) => currentCellOldDomains.length != 1 ? n != key : n)])
+      
       boardDomains[row][col] = [] 
       // reassigns domain of newly assigned cell to length 1, ie [1]
       boardDomains[row][col].push(key)
-      let inferences = inference(csp, board, boardDomains, unassignedCell)
+      let inferences = inference(csp, board, boardDomains, unassignedCell, changedBoardDomains)
       
       if (inferences) {
+        
         // csp.push(inferences)
         let result = backtrack(csp, board, boardDomains)
+
         // if result does not equal failure, return result
         if (result) {//if result true, board is complete
           return true
         }
+
+        if (isBoardComplete(board)) {
+          console.log("second board complete returned true")
+          return true
+        }
+        while (changedBoardDomains.length != 0) {
+          let changedCellRow = changedBoardDomains[0][0]
+          let changedCellCol = changedBoardDomains[0][1]
+          let changedCellDomain = changedBoardDomains[0][2]
+          // console.log(changedCellDomain)
+          boardDomains[changedCellRow][changedCellCol] = changedCellDomain
+          // take the first changed cell domain out of list
+          changedBoardDomains.shift()
+        }
         // csp.pop(inferences)//!!!!!! needs to be fixed
-      } else {
-        
-        console.log("INFERENCE IS FALSE")
+      }
         // reset all changes made
         // reset current cell assignment back to 0
         let currentBoard = board
@@ -94,20 +120,30 @@ function backtrack(csp: any, board: any, boardDomains: any) {
         board[row][col] = 0
         
         // saves current cell's domain of length 1 ie [1] - that doens't work for the cell
-        let currentCellNewDomain = boardDomains[row][col]
+        const currentCellNewDomain = boardDomains[row][col]
         // saves originalBoardDomains, ie all cells have [1, 2, 3, 4]
-        let originalBoardDomains = getCellDomains(csp, board)
+        // let originalBoardDomains = getCellDomains(csp, board)
         // set reassigned cell back to its original domain
         // boardDomains[row][col] = currentCellOldDomains
-  
-        boardDomains = originalBoardDomains
+
+
+        // while (changedBoardDomains.length != 0) {
+        //   let changedCellRow = changedBoardDomains[0][0]
+        //   let changedCellCol = changedBoardDomains[0][1]
+        //   let changedCellDomain = changedBoardDomains[0][2]
+        //   // console.log(changedCellDomain)
+        //   boardDomains[changedCellRow][changedCellCol] = changedCellDomain
+        //   // take the first changed cell domain out of list
+        //   changedBoardDomains.shift()
+        // }
+        
+        // boardDomains = originalBoardDomains
   
         // get the index of the domain that didn't work, ie where is 1 in [1, 2, 3, 4]
         // let index = originalBoardDomains[row][col].indexOf(currentCellNewDomain[0])
         // remove domain that didn't work from current cell's original domain
         // boardDomains[row][col].splice(index, 1)
-        boardDomains[row][col].filter((n: any) => n != currentCellNewDomain[0])
-      }
+        // boardDomains[row][col].filter((n: any) => n != currentCellNewDomain[0])
     }
   });
   return false
@@ -145,7 +181,7 @@ const getNeighbors = (board: any, queue: any, row: any, col: any) => {
 }
 
 // AC-3 Algorithm
-const inference = (csp: any, board: any, boardDomains: any, unassignedCell: any) => {
+const inference = (csp: any, board: any, boardDomains: any, unassignedCell: any, changedBoardDomains: any) => {
   let row = unassignedCell[0]
   let col = unassignedCell[1]
   let initialQueue: any[] = []
@@ -159,41 +195,44 @@ const inference = (csp: any, board: any, boardDomains: any, unassignedCell: any)
       var XiRow = popped[0]
       var XiCol = popped[1]
     }
-    let revised = revise(csp, popped, boardDomains)
+    let revised = revise(csp, popped, boardDomains, changedBoardDomains)
     if (revised) {
       if (boardDomains[XiRow][XiCol].length == 0) {
         // failure when there is nothing left in the domain
         return false
       }
-      let initialNeighborsQueue: never[] = []
-      let neighborsQueue = getNeighbors(board, initialNeighborsQueue, XiRow, XiCol)
+      // let initialNeighborsQueue: never[] = []
+      queue = getNeighbors(board, queue, XiRow, XiCol)
       // neighborsQueue.pop([XjRow, XjCol, XiRow, XiCol])//<-- needs to be replaced
-      queue = queue.concat(neighborsQueue)
+      // queue = queue.concat(neighborsQueue)
     }
   }
   return true
 }
 
 // REVISE called in AC-3
-const revise = (csp: any, popped: any, boardDomains: any) => {
+const revise = (csp: any, popped: any, boardDomains: any, changedBoardDomains: any) => {
   let revised = false
   let XiRow = popped[0]
   let XiCol = popped[1]
   let XjRow = popped[2]
   let XjCol = popped[3]
 
+  const changedBoardDomain = structuredClone(boardDomains[XiRow][XiCol])
   boardDomains[XiRow][XiCol].forEach((x: any) => {
     // if no value in Xj's domain allows (Di, Dj) to satisfy the constraint b/w Xi and Xj
     // Xi's domain = {1, 2, 3}, Xj's domain = {3}
-    console.log("board domain of Xj: " + boardDomains[XjRow][XjCol]) //8
-    console.log("XjRow: " + XjRow + ", XjCol: " + XjCol)
-    console.log("board domain of Xi: " + boardDomains[XiRow][XiCol]) //8
-    console.log("XiRow: " + XiRow + ", XjCol: " + XiCol)
+    // console.log("board domain of Xj: " + boardDomains[XjRow][XjCol]) //8
+    // console.log("XjRow: " + XjRow + ", XjCol: " + XjCol)
+    // console.log("board domain of Xi: " + boardDomains[XiRow][XiCol]) //8
+    // console.log("XiRow: " + XiRow + ", XjCol: " + XiCol)
     if (boardDomains[XjRow][XjCol].includes(x) && boardDomains[XjRow][XjCol].length == 1) { //Di {1,2,3} Dj{1,2,3,4}
-      console.log("true in if statement here!")
+      changedBoardDomains.push([XiRow, XiCol, changedBoardDomain])
+      // console.log("true in if statement here!")
       let index = boardDomains[XiRow][XiCol].indexOf(x)
       boardDomains[XiRow][XiCol].splice(index, 1)
       revised = true
+      return revised
     }
   });
   return revised;
@@ -312,6 +351,12 @@ const getDegree = (board: any, row: any, col: any) => {
 }
 
 
+// if any 2 cells in a row/col/box have 2 of the same domain, remove those domains from all other cells in same row/col/box,
+// if any 3 cells in a row/col/box have 3 of the same domain, remove those domains from all toher cells in same row/col/box
+// ie 3 cells in a row have [1,5,9], remove this domain from other cells in same row
+// ie 3 cells in a row have domains [1,6], [1,4], [1,4,6], remove those domains from other cells in same row
+// check a box/cell/row, if a single domain only appears once in one cell, even though the length of that cell's domain is greater than 1, set that cell to that domain
+// ^ ie if a cell's domain in a box is [1,4,7,9] and that's the only cell to have a domain with a 7, choose that cell to assign 7 to
 const getCellDomains = (csp: any, board: any) => {
   var boardSize = board.length
   var domainBoard = Array.from(Array(boardSize), () => new Array(boardSize))
@@ -384,7 +429,8 @@ const getNumbersInSameBox = (board: any, row: number, col: number) => {
       let x = (Math.floor(row / rowSize)*rowSize)+i
       let y = (Math.floor(col / colSize)*colSize)+j
       // added this to check that we don't add numbers in same box that were already added
-      if (((board[x][y] != 0) && (x != row) && (y != col) && (x != row || y != col))) {
+      // if (((board[x][y] != 0) && (x != row) && (y != col) && (x != row || y != col))) {
+      if ((board[x][y] != 0) && (x != row) && (y != col)) {
         numbersInSameBox.push(board[x][y])
       }
     }
