@@ -78,7 +78,7 @@ function backtrack(csp: any, board: any, boardDomains: any) {
       let currentCol = col
       // saves the original domain of newly assigned cell, ie [1, 2, 3, 4]
       const currentCellOldDomains = structuredClone(boardDomains[row][col])
-      console.log("Assigning " + key + " to row " + row + ", col " + col)
+      // console.lsog("Assigning " + key + " to row " + row + ", col " + col)
       
       //currentCellOldDomains lenght = 1
       changedBoardDomains.push([row, col, currentCellOldDomains.filter((n: any) => currentCellOldDomains.length != 1 ? n != key : n)])
@@ -121,9 +121,7 @@ function backtrack(csp: any, board: any, boardDomains: any) {
         
         // saves current cell's domain of length 1 ie [1] - that doens't work for the cell
         const currentCellNewDomain = boardDomains[row][col]
-        // saves originalBoardDomains, ie all cells have [1, 2, 3, 4]
         // let originalBoardDomains = getCellDomains(csp, board)
-        // set reassigned cell back to its original domain
         // boardDomains[row][col] = currentCellOldDomains
 
 
@@ -137,13 +135,6 @@ function backtrack(csp: any, board: any, boardDomains: any) {
         //   changedBoardDomains.shift()
         // }
         
-        // boardDomains = originalBoardDomains
-  
-        // get the index of the domain that didn't work, ie where is 1 in [1, 2, 3, 4]
-        // let index = originalBoardDomains[row][col].indexOf(currentCellNewDomain[0])
-        // remove domain that didn't work from current cell's original domain
-        // boardDomains[row][col].splice(index, 1)
-        // boardDomains[row][col].filter((n: any) => n != currentCellNewDomain[0])
     }
   });
   return false
