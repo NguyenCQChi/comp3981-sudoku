@@ -7,6 +7,7 @@ import { useTheme } from '@mui/material/styles';
 import { stackBruteForce } from '@src/utils/brute-force';
 import { CircularProgress } from '@mui/material';
 import { CSP } from '@src/utils/csp';
+import { grid } from '@mui/system';
 
 const OneSolution = (props: any) => {
   const {
@@ -26,41 +27,57 @@ const OneSolution = (props: any) => {
   const [loading, setLoading] = useState(false)
   const path = `/twoSolutions/${size}`
 
-  const handleSolveBF = () => {
-    // setLoading(true)
-    let startTime = performance.now()
-    // console.log("start " + startTime)
-    // bruteForce(gridBoard)
-    stackBruteForce(gridBoard)
-    let endTime = performance.now()
-    // console.log("end " + endTime)
-    let solveBFTime = endTime - startTime
-    console.log(solveBFTime)
-    changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
-    // if (solveBFTime > 1000) {
-    //   clearTimeout(timerId)
-    // }
-    // setLoading(false)
-    // changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
-    
+  // const handleSolveCSP = () => {
+  //   let startTime = performance.now()
+  //   CSP(gridBoard)
+  //   let endTime = performance.now()
+  //   let solveCSPTime = endTime - startTime
+  //   changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
+  //   setOpenSolveCSP(true)
+  //   changeResultCSP(gridBoard)
+  // }
+
+  const handleSolveBF = async() => {
     setOpenSolveBF(true)
-    changeResultBF(gridBoard)
-    // setGridBoard(gridBoard)
+    setLoading(true)
+    const payload = {
+      value: gridBoard
+    }
+    let startTime = performance.now()
+    const result = await fetch('/api/brute_force', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    let endTime = performance.now()
+    let solveBFTime = endTime - startTime
+    const value = await result.json()
+    setGridBoard(value)
+    changeResultBF(value)
+    setLoading(false)
+    changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
   }
 
-  const handleSolveCSP = () => {
-    let startTime = performance.now()
-    CSP(gridBoard)
-    let endTime = performance.now()
-    let solveCSPTime = endTime - startTime
-    changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
-    setOpenSolveCSP(true)
-    changeResultCSP(gridBoard)
+  const handleSolveCSP = async() => {
+    const payload = {
+      value: gridBoard
+    }
+    const result = await fetch('/api/csp', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    console.log(result)
   }
 
   useEffect(() => {
     setGridBoard(initialBoard)
-    // console.log(initialBoard)
     if(size == 100) {
       // @ts-ignore 
       const initialValue = document.body.style.zoom;
@@ -124,7 +141,11 @@ const OneSolution = (props: any) => {
             sudokuBoard={gridBoard}
             solved={openSolveBF || openSolveCSP}
             />
-            {loading && <CircularProgress />}
+            {loading && 
+              <div style={{marginTop: '10px'}}>
+                <CircularProgress />
+              </div>
+            }
           {openSolveBF && !openSolveCSP && 
             <div>
               <p>Solved Brute Force!</p>

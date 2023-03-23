@@ -5,20 +5,6 @@ const CSP = (board: any) => {
   backtrack(csp, board, originalBoardDomains)
 };
 
-// const getAllArcs = (board: any) => {
-//   let queue: any[] = []
-//   // queue[0][1] = [XiRow, XiCol, XjRow, XjCol]
-
-//   for (let i = 0; i < board.length; i++) {
-//     for (let j = 0; j < board.length; j++) {
-//       let emptyNeighborsQueue: any[] = []
-//       let neighborsQueue: any[] = getNeighbors(board, emptyNeighborsQueue, i, j)
-//       queue = queue.concat(neighborsQueue)      
-//     }
-//   }
-//   return queue
-// }
-
 //n = size of board, c = 1-size of board (all the choices)
 const isValid = (board: any, x: number, y: number, n: number, c: any) => {
   const rowSize = Math.floor(Math.sqrt(n))
