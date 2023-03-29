@@ -34,7 +34,7 @@ const isValid = (board: any, x: number, y: number, n: number, c: any) => {
 function backtrack(csp: any, board: any, boardDomains: any) {
   const completed = isBoardComplete(board)
   if (completed) {
-    // console.log("Board should be complete here")
+    console.log("Board should be complete here")
     return board
   }
 
