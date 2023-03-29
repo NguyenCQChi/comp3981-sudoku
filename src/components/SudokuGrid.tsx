@@ -13,17 +13,10 @@ const SudokuGrid = (props: any) => {
   const theme = useTheme();
   const [columnLine, setColumnLine] = useState(3)
   const [rowLine, setRowLine] = useState(3)
-  // const [gridBoard, setGridBoard] = useState<any>([[]]);
-  // const { 
-  //   resultBF,
-  //   resultCSP,
-  // } = useContext(ResultContext);
 
   useEffect(() => {
     setRowLine(Math.floor(Math.sqrt(size)))
     setColumnLine(Math.ceil(Math.sqrt(size)))
-    // setGridBoard(sudokuBoard)
-    // console.log(sudokuBoard)
   }, [solved])
 
   return (
