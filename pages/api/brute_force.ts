@@ -4,10 +4,9 @@ export default function handler(req: any, res: any) {
   var board = req.body.value
   const solved = stackBruteForce(board)
   if (solved) {
-    console.log(board)
-    res.status(200).json(board)
+    res.status(200).json({"board": board})
   } else {
-    res.status(404).json({"error": "Not be able to solve"})
+    res.status(404).json({"error": "Not be able to solve", "board": board})
   }
 }
 
