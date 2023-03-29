@@ -27,15 +27,15 @@ const OneSolution = (props: any) => {
   const [loading, setLoading] = useState(false)
   const path = `/twoSolutions/${size}`
 
-  const handleSolveCSP = () => {
-    let startTime = performance.now()
-    CSP(gridBoard)
-    let endTime = performance.now()
-    let solveCSPTime = endTime - startTime
-    changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
-    setOpenSolveCSP(true)
-    changeResultCSP(gridBoard)
-  }
+  // const handleSolveCSP = () => {
+  //   let startTime = performance.now()
+  //   CSP(gridBoard)
+  //   let endTime = performance.now()
+  //   let solveCSPTime = endTime - startTime
+  //   changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
+  //   setOpenSolveCSP(true)
+  //   changeResultCSP(gridBoard)
+  // }
 
   async function fetchWithTimeout(resource: any, options: any) {
     const { timeout = 300000 } = options;
@@ -84,20 +84,34 @@ const OneSolution = (props: any) => {
     changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
   }
 
-  // const handleSolveCSP = async() => {
-  //   const payload = {
-  //     value: gridBoard
-  //   }
-  //   const result = await fetch('/api/csp', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Accept': 'application/json',
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify(payload)
-  //   })
-  //   console.log(result)
-  // }
+  const handleSolveCSP = async() => {
+    setOpenSolveCSP(true)
+    setLoading(true)
+    const payload = {
+      value: gridBoard
+    }
+
+    let startTime = performance.now()
+    try {
+      const result = await fetchWithTimeout('/api/csp', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        timeout: 300000
+      })
+      console.log(result)
+    } catch (error: any) {
+      console.log(error.name == 'AbortError');
+    }
+    const endTime = performance.now()
+    let solveCSPTime = endTime - startTime
+
+    setLoading(false)
+    changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
+  }
 
   useEffect(() => {
     setGridBoard(initialBoard)
