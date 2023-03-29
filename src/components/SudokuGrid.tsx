@@ -13,56 +13,18 @@ const SudokuGrid = (props: any) => {
   const theme = useTheme();
   const [columnLine, setColumnLine] = useState(3)
   const [rowLine, setRowLine] = useState(3)
-  const [gridBoard, setGridBoard] = useState<any>([[]]);
-  const { 
-    resultBF,
-    resultCSP,
-  } = useContext(ResultContext);
+  // const [gridBoard, setGridBoard] = useState<any>([[]]);
+  // const { 
+  //   resultBF,
+  //   resultCSP,
+  // } = useContext(ResultContext);
 
   useEffect(() => {
     setRowLine(Math.floor(Math.sqrt(size)))
     setColumnLine(Math.ceil(Math.sqrt(size)))
-    setGridBoard(sudokuBoard)
+    // setGridBoard(sudokuBoard)
     // console.log(sudokuBoard)
-      // if (size == 12) {
-      //   setRowLine(4)
-      // } else if (size == 16) {
-      //   setColumnLine(4)
-      //   setRowLine(4)
-      // } else if (size == 25) {
-      //   setColumnLine(5)
-      //   setRowLine(5)
-      // } else if (size == 100) {
-      //   setColumnLine(10)
-      //   setRowLine(10)
-      // }
-    //   if(solved) {
-    //     setGridBoard(resultBF)
-    //   } else {
-    //     if (size == 9) {
-    //       // changeResultBF(solvedNineByNine)
-    //       // changeResultCSP(solvedNineByNine)
-    //       // createBlanks(solvedNineByNine)
-    //     } else if (size == 12) {
-    //       changeResultBF(solvedTwelveByTwelve)
-    //       changeResultCSP(solvedTwelveByTwelve)
-    //       createBlanks(solvedTwelveByTwelve)
-    //     } else if (size == 16) {
-    //       changeResultBF(solvedSixteenBySixteen)
-    //       changeResultCSP(solvedSixteenBySixteen)
-    //       createBlanks(solvedSixteenBySixteen)
-    //     } else if (size == 25) {
-    //       changeResultBF(solvedTwentyFiveByTwentyFive)
-    //       changeResultCSP(solvedTwentyFiveByTwentyFive)
-    //       createBlanks(solvedTwentyFiveByTwentyFive)
-    //     } else if (size == 100) {
-    //       changeResultCSP(solvedHundredByHundred)
-    //       createBlanks(solvedHundredByHundred)
-    //     }
-    //   }
-    // } else {
-    
-  }, [solved, resultBF, resultCSP])
+  }, [solved])
 
   return (
     <Table
@@ -74,7 +36,7 @@ const SudokuGrid = (props: any) => {
         }}
       >
         <TableBody>
-          {gridBoard.map((col: any, position: any) => (
+          {sudokuBoard.map((col: any, position: any) => (
             <TableRow
               sx={{
                 border: `1px solid ${theme.palette.primary.dark}`,
@@ -82,7 +44,7 @@ const SudokuGrid = (props: any) => {
               }}
               key={position}
             >
-              {gridBoard[position].map((column: any, key: any) => (
+              {sudokuBoard[position].map((column: any, key: any) => (
                 <TableCell 
                   key={key}
                   sx={{

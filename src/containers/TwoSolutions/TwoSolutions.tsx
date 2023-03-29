@@ -8,9 +8,12 @@ const TwoSolutions = ({size}: {size: String}) => {
   const { 
     resultBF, 
     resultCSP, 
+    initialBoard,
     timeBF, 
-    timeCSP } = useContext(ResultContext);
+    timeCSP, statusBF, statusCSP} = useContext(ResultContext);
   const [sizeState, setSizeState] = useState<boolean>();
+  const [BFBoard, setBFBoard] = useState<string[][]>(resultBF.length > 0 ? resultBF : initialBoard);
+  const [CSPBoard, setCSPBoard] = useState<string[][]>(resultCSP.length > 0 ? resultCSP : initialBoard);
   const theme = useTheme();
 
   useEffect(() => {
@@ -21,13 +24,40 @@ const TwoSolutions = ({size}: {size: String}) => {
     }
   }, [size])
 
+  useEffect(() => {
+    console.log("initial board")
+    console.log(initialBoard)
+  }, [initialBoard])
+
+  useEffect(() => {
+    console.log(resultBF)
+    if(resultBF.length > 0) {
+      setBFBoard(resultBF)
+    } else {
+      setBFBoard(initialBoard)
+      console.log("initial board")
+      console.log(initialBoard)
+    }
+  }, [resultBF])
+
+  useEffect(() => {
+    console.log(resultCSP)
+    if(resultCSP.length > 0) {
+      setCSPBoard(resultCSP)
+    } else {
+      setCSPBoard(initialBoard)
+      console.log("initial board")
+      console.log(initialBoard)
+    }
+  }, [resultCSP])
+
   return(
     <div style={{background: `linear-gradient(135deg, white, ${theme.palette.secondary.light} 50%, white)`, height: sizeState ? '100vh' : 'wrapContent'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', height: '100%', alignItems: 'center'}}>
         <div style={{height: sizeState ? '80%' : '95%', width: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <SudokuGrid size={size} solved={resultBF.length > 0}/>
+          <SudokuGrid size={size} solved={resultBF.length > 0} sudokuBoard={BFBoard}/>
           <div>
-              <p>Solved Brute Force!</p>
+              <p>{statusBF}</p>
               <p>Time spent: {timeBF}</p>
           </div>
         </div>
@@ -47,9 +77,9 @@ const TwoSolutions = ({size}: {size: String}) => {
         </Link>
         </div>
         <div style={{height: sizeState ? '80%' : '95%', width: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <SudokuGrid size={size} solved={resultCSP.length > 0}/>
+          <SudokuGrid size={size} solved={resultCSP.length > 0} sudokuBoard={CSPBoard}/>
           <div>
-            <p>Solved CSP!</p>
+            <p>{statusCSP}</p>
             <p>Time spent: {timeCSP}</p>
           </div>
         </div>

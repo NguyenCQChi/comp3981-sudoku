@@ -4,9 +4,7 @@ import MainButton from '@src/components/MainButton';
 import Link from 'next/link';
 import { ResultContext } from '@src/contexts/ResultContext';
 import { useTheme } from '@mui/material/styles';
-import { stackBruteForce } from '@src/utils/brute-force';
 import { CircularProgress } from '@mui/material';
-import { CSP } from '@src/utils/csp';
 import { grid } from '@mui/system';
 
 const OneSolution = (props: any) => {
@@ -20,22 +18,17 @@ const OneSolution = (props: any) => {
     timeCSP,
     changeResultBF,
     changeResultCSP,
+    resultBF,
+    statusBF, 
+    statusCSP,
+    changeStatusBF, 
+    changeStatusCSP,
     initialBoard } = useContext(ResultContext);
   const [openSolveBF, setOpenSolveBF] = useState(false)
   const [openSolveCSP, setOpenSolveCSP] = useState(false)
   const [gridBoard, setGridBoard] = useState(initialBoard)
   const [loading, setLoading] = useState(false)
   const path = `/twoSolutions/${size}`
-
-  // const handleSolveCSP = () => {
-  //   let startTime = performance.now()
-  //   CSP(gridBoard)
-  //   let endTime = performance.now()
-  //   let solveCSPTime = endTime - startTime
-  //   changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
-  //   setOpenSolveCSP(true)
-  //   changeResultCSP(gridBoard)
-  // }
 
   async function fetchWithTimeout(resource: any, options: any) {
     const { timeout = 300000 } = options;
@@ -56,7 +49,7 @@ const OneSolution = (props: any) => {
     setOpenSolveBF(true)
     setLoading(true)
     const payload = {
-      value: gridBoard
+      value: initialBoard
     }
     let startTime = performance.now()
 
@@ -70,25 +63,34 @@ const OneSolution = (props: any) => {
         body: JSON.stringify(payload),
         timeout: 300000
       })
+      const status = await result.status
+      if(status == 200) {
+        changeStatusBF("Solved Brute Force!")
+      } else {
+        changeStatusBF("Cannot solve Brute Force!")
+      }
       const value = await result.json()
-      setGridBoard(value)
-      changeResultBF(value)
+      console.log(value)
+      setGridBoard(value.board)
+      changeResultBF(value.board)
+      console.log("initial board after calling api")
+      console.log(initialBoard)
     } catch (error : any) {
       console.log(error.name == 'AbortError');
     }
     
     let endTime = performance.now()
-    let solveBFTime = endTime - startTime
+    let solveBFTime = (endTime - startTime)/1000
     
     setLoading(false)
-    changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
+    changeTimeBF(`${solveBFTime.toFixed(4)}s`)
   }
 
   const handleSolveCSP = async() => {
     setOpenSolveCSP(true)
     setLoading(true)
     const payload = {
-      value: gridBoard
+      value: initialBoard
     }
 
     let startTime = performance.now()
@@ -103,18 +105,30 @@ const OneSolution = (props: any) => {
         timeout: 300000
       })
       console.log(result)
+      const status = await result.status
+      if(status == 200) {
+        changeStatusCSP("Solved CSP!")
+      } else {
+        changeStatusCSP("Cannot solve CSP!")
+      }
+      const value = await result.json()
+      console.log(value)
+      setGridBoard(value.board)
+      changeResultCSP(value.board)
+      console.log("initial board after calling api")
+      console.log(initialBoard)
     } catch (error: any) {
       console.log(error.name == 'AbortError');
     }
     const endTime = performance.now()
-    let solveCSPTime = endTime - startTime
+    let solveCSPTime = (endTime - startTime)/1000
 
     setLoading(false)
-    changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
+    changeTimeCSP(`${solveCSPTime.toFixed(4)}s`)
   }
 
   useEffect(() => {
-    setGridBoard(initialBoard)
+    console.log(gridBoard)
     if(size == 100) {
       // @ts-ignore 
       const initialValue = document.body.style.zoom;
@@ -183,15 +197,15 @@ const OneSolution = (props: any) => {
                 <CircularProgress />
               </div>
             }
-          {openSolveBF && !openSolveCSP && 
+          {openSolveBF && !openSolveCSP && !loading && 
             <div>
-              <p>Solved Brute Force!</p>
+              <p>{statusBF}</p>
               <p>Time spent: {timeBF}</p>
             </div>
           }
-          {openSolveCSP && !openSolveBF &&
+          {openSolveCSP && !openSolveBF && !loading &&
             <div>
-              <p>Solved CSP!</p>
+              <p>{statusCSP}</p>
               <p>Time spent: {timeCSP}</p>
             </div>
           }

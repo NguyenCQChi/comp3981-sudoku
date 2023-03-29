@@ -5,20 +5,13 @@ export default function handler(req: any, res: any) {
   const boardSize= board.length  
   let csp: never[] = []
   var originalBoardDomains = getCellDomains(csp, board)
-  var result = backtrack(csp, board, originalBoardDomains)
-  if(result) {
-    res.status(200).json(board)
+  backtrack(csp, board, originalBoardDomains)
+  if (isBoardComplete(board)) {
+    res.status(200).json({"board": board})
   } else {
     res.status(404).json({"error": "Not be able to solve", "board": board})
   }
 }
-
-const CSP = (board: any) => {
-  const boardSize= board.length  
-  let csp: never[] = []
-  var originalBoardDomains = getCellDomains(csp, board)
-  backtrack(csp, board, originalBoardDomains)
-};
 
 //n = size of board, c = 1-size of board (all the choices)
 const isValid = (board: any, x: number, y: number, n: number, c: any) => {
@@ -61,11 +54,11 @@ function backtrack(csp: any, board: any, boardDomains: any) {
   // order the values for which the variable should be tried (ie 1 or 9 or 5 or etc)
   var orderOfDomainValues = orderDomainValues(csp, unassignedCell, board, boardDomains) //map  
   var sortedDomainValues = sortOrderOfDomainValues(orderOfDomainValues)
-  console.log("sortedDomainValues: " + sortedDomainValues)
+  // console.log("sortedDomainValues: " + sortedDomainValues)
   
   //domainValue is not used, we just needed key in the map {key=1:2}
   sortedDomainValues.forEach((domainValue, key) => {
-    console.log(domainValue);
+    // console.log(domainValue);
     // const currentIterationBoardDomains = boardDomains
     var changedBoardDomains: any[] = []
     if (isValid(board, row, col, board.length, key)) {
@@ -388,7 +381,6 @@ const getCellDomains = (csp: any, board: any) => {
       }
     }
   }
-  let cellDomains = domainBoard
   return domainBoard
 }
 
@@ -460,5 +452,3 @@ const isBoardComplete = (board: any) => {
   }
   return true
 }
-
-export { CSP };
