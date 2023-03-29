@@ -34,7 +34,7 @@ const isValid = (board: any, x: number, y: number, n: number, c: any) => {
 function backtrack(csp: any, board: any, boardDomains: any) {
   const completed = isBoardComplete(board)
   if (completed) {
-    console.log("Board should be complete here")
+    // console.log("Board should be complete here")
     return board
   }
 
@@ -46,9 +46,11 @@ function backtrack(csp: any, board: any, boardDomains: any) {
   // order the values for which the variable should be tried (ie 1 or 9 or 5 or etc)
   var orderOfDomainValues = orderDomainValues(csp, unassignedCell, board, boardDomains) //map  
   var sortedDomainValues = sortOrderOfDomainValues(orderOfDomainValues)
+  console.log("sortedDomainValues: " + sortedDomainValues)
   
   //domainValue is not used, we just needed key in the map {key=1:2}
-  sortedDomainValues.forEach((domainValue,key) => {
+  sortedDomainValues.forEach((domainValue, key) => {
+    console.log(domainValue);
     // const currentIterationBoardDomains = boardDomains
     var changedBoardDomains: any[] = []
     if (isValid(board, row, col, board.length, key)) {

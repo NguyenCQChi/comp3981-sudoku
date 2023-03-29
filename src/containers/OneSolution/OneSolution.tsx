@@ -27,15 +27,30 @@ const OneSolution = (props: any) => {
   const [loading, setLoading] = useState(false)
   const path = `/twoSolutions/${size}`
 
-  // const handleSolveCSP = () => {
-  //   let startTime = performance.now()
-  //   CSP(gridBoard)
-  //   let endTime = performance.now()
-  //   let solveCSPTime = endTime - startTime
-  //   changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
-  //   setOpenSolveCSP(true)
-  //   changeResultCSP(gridBoard)
-  // }
+  const handleSolveCSP = () => {
+    let startTime = performance.now()
+    CSP(gridBoard)
+    let endTime = performance.now()
+    let solveCSPTime = endTime - startTime
+    changeTimeCSP(`${solveCSPTime.toFixed(2)}ms`)
+    setOpenSolveCSP(true)
+    changeResultCSP(gridBoard)
+  }
+
+  async function fetchWithTimeout(resource: any, options: any) {
+    const { timeout = 300000 } = options;
+
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    const result = await fetch(resource, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+
+    return result;
+  }
 
   const handleSolveBF = async() => {
     setOpenSolveBF(true)
@@ -44,37 +59,45 @@ const OneSolution = (props: any) => {
       value: gridBoard
     }
     let startTime = performance.now()
-    const result = await fetch('/api/brute_force', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
+
+    try {
+      const result = await fetchWithTimeout('/api/brute_force', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        timeout: 300000
+      })
+      const value = await result.json()
+      setGridBoard(value)
+      changeResultBF(value)
+    } catch (error : any) {
+      console.log(error.name == 'AbortError');
+    }
+    
     let endTime = performance.now()
     let solveBFTime = endTime - startTime
-    const value = await result.json()
-    setGridBoard(value)
-    changeResultBF(value)
+    
     setLoading(false)
     changeTimeBF(`${solveBFTime.toFixed(2)}ms`)
   }
 
-  const handleSolveCSP = async() => {
-    const payload = {
-      value: gridBoard
-    }
-    const result = await fetch('/api/csp', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-    console.log(result)
-  }
+  // const handleSolveCSP = async() => {
+  //   const payload = {
+  //     value: gridBoard
+  //   }
+  //   const result = await fetch('/api/csp', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Accept': 'application/json',
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify(payload)
+  //   })
+  //   console.log(result)
+  // }
 
   useEffect(() => {
     setGridBoard(initialBoard)

@@ -9,8 +9,6 @@ export default function handler(req: any, res: any) {
   } else {
     res.status(404).json({"error": "Not be able to solve"})
   }
-  // console.log(req.body.value[0])
-  // res.status(200).json({ name: 'John Doe' })
 }
 
 const stackBruteForce = (board: any) => {
