@@ -35,7 +35,7 @@ function backtrack(csp: any, board: any, boardDomains: any) {
   const completed = isBoardComplete(board)
   if (completed) {
     console.log("Board should be complete here")
-    return true
+    return board
   }
 
   // find which variable (cell) should be assigned next
@@ -64,10 +64,11 @@ function backtrack(csp: any, board: any, boardDomains: any) {
       let currentCol = col
       // saves the original domain of newly assigned cell, ie [1, 2, 3, 4]
       const currentCellOldDomains = structuredClone(boardDomains[row][col])
-      // console.lsog("Assigning " + key + " to row " + row + ", col " + col)
+      // console.log("Assigning " + key + " to row " + row + ", col " + col)
       
       //currentCellOldDomains lenght = 1
-      changedBoardDomains.push([row, col, currentCellOldDomains.filter((n: any) => currentCellOldDomains.length != 1 ? n != key : n)])
+      // changedBoardDomains.push([row, col, currentCellOldDomains.filter((n: any) => currentCellOldDomains.length != 1 ? n != key : n)])
+      changedBoardDomains.push([row, col, currentCellOldDomains])
       
       boardDomains[row][col] = [] 
       // reassigns domain of newly assigned cell to length 1, ie [1]
@@ -81,64 +82,69 @@ function backtrack(csp: any, board: any, boardDomains: any) {
 
         // if result does not equal failure, return result
         if (result) {//if result true, board is complete
-          return true
+          return result
         }
 
         if (isBoardComplete(board)) {
           console.log("second board complete returned true")
-          return true
+          return board
         }
-        while (changedBoardDomains.length != 0) {
-          let changedCellRow = changedBoardDomains[0][0]
-          let changedCellCol = changedBoardDomains[0][1]
-          let changedCellDomain = changedBoardDomains[0][2]
-          // console.log(changedCellDomain)
-          boardDomains[changedCellRow][changedCellCol] = changedCellDomain
-          // take the first changed cell domain out of list
-          changedBoardDomains.shift()
-        }
-        // csp.pop(inferences)//!!!!!! needs to be fixed
+        
+        // csp.pop(inferences)
       }
-        // reset all changes made
-        // reset current cell assignment back to 0
+      //if result is false, comes here
+      while (changedBoardDomains.length != 0) {
+        let changedCellRow = changedBoardDomains[0][0]
+        let changedCellCol = changedBoardDomains[0][1]
+        let changedCellDomain = changedBoardDomains[0][2]
+        // console.log(changedCellDomain)
+        boardDomains[changedCellRow][changedCellCol] = changedCellDomain
+        // take the first changed cell domain out of list
+        changedBoardDomains.shift()
+      }
+        // reset all changes made, ex. reset current cell assignment back to 0
         let currentBoard = board
         let currentBoardDomains = boardDomains
         board[row][col] = 0
         
         // saves current cell's domain of length 1 ie [1] - that doens't work for the cell
-        const currentCellNewDomain = boardDomains[row][col]
-        // let originalBoardDomains = getCellDomains(csp, board)
-        // boardDomains[row][col] = currentCellOldDomains
-
-
-        // while (changedBoardDomains.length != 0) {
-        //   let changedCellRow = changedBoardDomains[0][0]
-        //   let changedCellCol = changedBoardDomains[0][1]
-        //   let changedCellDomain = changedBoardDomains[0][2]
-        //   // console.log(changedCellDomain)
-        //   boardDomains[changedCellRow][changedCellCol] = changedCellDomain
-        //   // take the first changed cell domain out of list
-        //   changedBoardDomains.shift()
-        // }
-        
+        const currentCellNewDomain = boardDomains[row][col]        
     }
   });
   return false
 }
 
 const getNeighbors = (board: any, queue: any, row: any, col: any) => {
+  let currentQueue = queue
+  let currentBoard = board
   
   for (let i = 0; i < board.length; i++) {
     if (board[row][i] == 0 && i != col) {
       // Xi = row, i 
       // Xj = row, col
-      queue.push([row, i, row, col])
+      let isInQueue = false
+      queue.forEach((arc: any) => {
+        if (arc[0] == row && arc[1] == i && arc[2] == row && arc[3] == col) {
+          isInQueue = true;
+        }
+      });
+      if (!isInQueue) {
+        queue.push([row, i, row, col])
+      }
     }
   }
 
   for (let i = 0; i < board.length; i++) {
     if (board[i][col] == 0 && i != row) {
-      queue.push([i, col, row, col])
+      let isInQueue = false
+      queue.forEach((arc: any) => {
+        if (arc[0] == i && arc[1] == col && arc[2] == row && arc[3] == col) {
+          isInQueue = true;
+        }
+      });
+      if (!isInQueue) {
+        queue.push([i, col, row, col])
+      }
     }
   }
   
@@ -150,7 +156,16 @@ const getNeighbors = (board: any, queue: any, row: any, col: any) => {
       let x = (Math.floor(row / rowSize)*rowSize)+i
       let y = (Math.floor(col / colSize)*colSize)+j
       if (board[x][y] == 0 && x != row && y != col) {
+        let isInQueue = false
+      queue.forEach((arc: any) => {
+        if (arc[0] == x && arc[1] == y && arc[2] == row && arc[3] == col) {
+          isInQueue = true;
+        }
+      });
+      if (!isInQueue) {
         queue.push([x, y, row, col])
+      }
+
       }
     }
   }
@@ -162,6 +177,8 @@ const inference = (csp: any, board: any, boardDomains: any, unassignedCell: any,
   let row = unassignedCell[0]
   let col = unassignedCell[1]
   let initialQueue: any[] = []
+  let currentBoard = board
+  let currentBoardDomains = boardDomains
   let queue = getNeighbors(board, initialQueue, row, col)
   // instead of getting all arc, try getting only changed cell's neighbor arcs
   // let queue = getAllArcs(board)
