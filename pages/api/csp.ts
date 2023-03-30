@@ -8,6 +8,7 @@ export default function handler(req: any, res: any) {
   backtrack(csp, board, originalBoardDomains)
   if (isBoardComplete(board)) {
     res.status(200).json({"board": board})
+    console.log(board)
   } else {
     res.status(404).json({"error": "Not be able to solve", "board": board})
   }
@@ -42,7 +43,7 @@ const isValid = (board: any, x: number, y: number, n: number, c: any) => {
 function backtrack(csp: any, board: any, boardDomains: any) {
   const completed = isBoardComplete(board)
   if (completed) {
-    console.log("Board should be complete here")
+    // console.log("Board should be complete here")
     return board
   }
 
@@ -96,7 +97,7 @@ function backtrack(csp: any, board: any, boardDomains: any) {
         }
 
         if (isBoardComplete(board)) {
-          console.log("second board complete returned true")
+          // console.log("second board complete returned true")
           return board
         }
         
