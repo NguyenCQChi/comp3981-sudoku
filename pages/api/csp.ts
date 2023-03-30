@@ -1,4 +1,5 @@
 // Solving CSP
+import _ from 'lodash';
 
 export default function handler(req: any, res: any) {
   var board = req.body.value
@@ -73,7 +74,7 @@ function backtrack(csp: any, board: any, boardDomains: any) {
       let currentRow = row
       let currentCol = col
       // saves the original domain of newly assigned cell, ie [1, 2, 3, 4]
-      const currentCellOldDomains = structuredClone(boardDomains[row][col])
+      const currentCellOldDomains = _.cloneDeep(boardDomains[row][col])
       // console.log("Assigning " + key + " to row " + row + ", col " + col)
       
       //currentCellOldDomains lenght = 1
@@ -222,7 +223,7 @@ const revise = (csp: any, popped: any, boardDomains: any, changedBoardDomains: a
   let XjRow = popped[2]
   let XjCol = popped[3]
 
-  const changedBoardDomain = structuredClone(boardDomains[XiRow][XiCol])
+  const changedBoardDomain = _.cloneDeep(boardDomains[XiRow][XiCol])
   boardDomains[XiRow][XiCol].forEach((x: any) => {
     // if no value in Xj's domain allows (Di, Dj) to satisfy the constraint b/w Xi and Xj
     // Xi's domain = {1, 2, 3}, Xj's domain = {3}
