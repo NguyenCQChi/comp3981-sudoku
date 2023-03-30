@@ -61,7 +61,11 @@ const TwoSolutions = ({size}: {size: String}) => {
               <p>Time spent: {timeBF}</p>
           </div>
         </div>
+
         <div style={{width: '15%', display: 'flex', flexDirection: 'column', gap: '8px'}}>
+          <div style={{padding: '15px', textAlign: 'center'}}>
+              <p style={{fontSize: '2rem', marginBottom: '2rem', fontWeight: 700, color: theme.palette.primary.dark}}>{size} x {size}</p>
+          </div>
           <MainButton title="Create" option={false} disable={true} />
           <MainButton title='Solve Brute Force' option={false} disable={true}/>
           <MainButton title ='Solve CSP' option={false} disable={true}/>
