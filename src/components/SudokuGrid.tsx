@@ -1,9 +1,7 @@
 /* eslint-disable react/jsx-key */
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import {Table, TableCell, TableRow, TableBody} from "@mui/material";
-import { ResultContext } from '@src/contexts/ResultContext';
 import { useTheme } from '@mui/material/styles';
-// import { bruteForce } from '@src/utils/brute-force';
 const SudokuGrid = (props: any) => {
   const {
     size,

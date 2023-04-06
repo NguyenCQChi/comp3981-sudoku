@@ -247,7 +247,6 @@ function createBlanks(gridBoard: any) {
       createBlanks(solvedNineByNine)
     } else if(size == "12x12") {
       createBlanks(solvedTwelveByTwelve)
-      // changeInitialBoard(solvedTwelveByTwelve)
     } else if (size == "16x16"){
       createBlanks(solvedSixteenBySixteen)
     } else if(size == "25x25") {
@@ -322,8 +321,6 @@ function createBlanks(gridBoard: any) {
         }
     }
   }
-
-  
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', background: `linear-gradient(135deg, white, ${theme.palette.secondary.light} 50%, white)`}}>
