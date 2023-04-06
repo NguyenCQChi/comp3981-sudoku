@@ -32,29 +32,18 @@ const TwoSolutions = ({size}: {size: String}) => {
   }, [size])
 
   useEffect(() => {
-    console.log("initial board")
-    console.log(initialBoard)
-  }, [initialBoard])
-
-  useEffect(() => {
-    console.log(resultBF)
     if(resultBF.length > 0) {
       setBFBoard(resultBF)
     } else {
       setBFBoard(initialBoard)
-      console.log("initial board")
-      console.log(initialBoard)
     }
   }, [resultBF])
 
   useEffect(() => {
-    console.log(resultCSP)
     if(resultCSP.length > 0) {
       setCSPBoard(resultCSP)
     } else {
       setCSPBoard(initialBoard)
-      console.log("initial board")
-      console.log(initialBoard)
     }
   }, [resultCSP])
 

@@ -1,3 +1,6 @@
+/**
+ * Context used to provide other components access to some common attributes - such as initial board, result boards and solved time
+ */
 import { createContext, ReactNode, useState } from 'react';
 
 interface Props {

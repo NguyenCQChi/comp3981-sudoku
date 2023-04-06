@@ -22,6 +22,7 @@ const isBoardComplete = (board: any) => {
   return true
 }
 
+//stack implementation of brute force algorithm creates an initial stack with all empty cells
 const stackBruteForce = (board: any) => {
   let stack = []
   for (let i = 0; i < board.length; i++) {
@@ -35,9 +36,7 @@ const stackBruteForce = (board: any) => {
   return isBoardComplete(board)
 }
 
-// let startRow = Math.floor(i / Math.ceil(Math.sqrt(sudokuBoard.length))) * Math.sqrt(sudokuBoard.length)
-//         let startCol = Math.floor(i / Math.floor(Math.sqrt(sudokuBoard.length))) * Math.sqrt(sudokuBoard.length)
-
+//recursive function that deals with the stack, if the stack size is zero then function returns ie does"backtracking"
 const dfsStack = (board: any, stack: any) => {
   const boardSize = board.length
   const rowSize = Math.floor(Math.sqrt(boardSize))
@@ -47,6 +46,7 @@ const dfsStack = (board: any, stack: any) => {
   let x = poppedStack[0]
   let y = poppedStack[1]
   
+  //get the box that the popped value resides in
   let box = []
   for (let i = 0; i < rowSize; i++) {
     for (let j = 0; j < colSize; j++) {
@@ -54,6 +54,7 @@ const dfsStack = (board: any, stack: any) => {
     }
   }
 
+  //gets the row and col that the popped value resides in
   let row = []
   let col = []
   for (let i = 0; i < boardSize; i++) {
@@ -61,6 +62,7 @@ const dfsStack = (board: any, stack: any) => {
     col.push(board[i][y])
   }
 
+  //if i is not included in the box, row, or column then assign i to x,y and call dfs stack again. On return check if the stack is zero
   for (let i = 1; i <= boardSize; i++) {
     if (!row.includes(i) && !col.includes(i) && !box.includes(i)) {
       board[x][y] = i
@@ -68,7 +70,9 @@ const dfsStack = (board: any, stack: any) => {
       if (stack.length == 0) return;
     }
   }
+  //if algorithm reaches this point it means dfs failed somewhere and we need to reset board[x][y] so future calls of dfs are not affected
   board[x][y] = 0
+  //push x,y to the stack
   stack.push([x, y])
 }
 

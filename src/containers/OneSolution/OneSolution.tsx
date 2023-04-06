@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { ResultContext } from '@src/contexts/ResultContext';
 import { useTheme } from '@mui/material/styles';
 import { CircularProgress } from '@mui/material';
-import { grid } from '@mui/system';
 
 const OneSolution = (props: any) => {
   const {
@@ -18,7 +17,6 @@ const OneSolution = (props: any) => {
     timeCSP,
     changeResultBF,
     changeResultCSP,
-    resultBF,
     statusBF, 
     statusCSP,
     changeStatusBF, 
@@ -77,7 +75,6 @@ const OneSolution = (props: any) => {
           changeStatusBF("Cannot solve Brute Force!")
         }
         const value = await result.json()
-        console.log(value)
         setGridBoard(value.board)
         changeResultBF(value.board)
       } catch (error : any) {
@@ -101,7 +98,6 @@ const OneSolution = (props: any) => {
     var boardIsComplete = false;
     let i = 0;
     while (!boardIsComplete && i < 10) {
-      console.log("solving " + i + " times")
       i++
       let startTime = performance.now()
       try {
@@ -114,7 +110,6 @@ const OneSolution = (props: any) => {
           body: JSON.stringify(payload),
           timeout: 300000
         })
-        console.log(result)
         const status = await result.status
         if(status == 200) {
           boardIsComplete = true
@@ -124,11 +119,8 @@ const OneSolution = (props: any) => {
           changeStatusCSP("Cannot solve CSP!")
         }
         const value = await result.json()
-        console.log(value)
         setGridBoard(value.board)
         changeResultCSP(value.board)
-        console.log("initial board after calling api")
-        console.log(initialBoard)
       } catch (error: any) {
         console.log(error.name == 'AbortError');
       }
@@ -147,7 +139,6 @@ const OneSolution = (props: any) => {
   }
 
   useEffect(() => {
-    console.log(gridBoard)
     if(size == 100) {
       // @ts-ignore 
       const initialValue = document.body.style.zoom;
