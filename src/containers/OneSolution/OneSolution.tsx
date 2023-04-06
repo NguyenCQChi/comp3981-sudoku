@@ -82,7 +82,8 @@ const OneSolution = (props: any) => {
       }
       
       let endTime = performance.now()
-      solveBFTime = (endTime - startTime)/1000      
+      solveBFTime = (endTime - startTime)/1000   
+      console.log(`Attempt ${i} in ${solveBFTime.toFixed(4)}s`)   
     }
     setLoading(false)
     changeTimeBF(`${solveBFTime.toFixed(4)}s`)
@@ -126,6 +127,7 @@ const OneSolution = (props: any) => {
       }
       const endTime = performance.now()
       solveCSPTime = (endTime - startTime)/1000
+      console.log(`Attempt ${i} in ${solveCSPTime.toFixed(4)}s`)
     }
     setLoading(false)
     changeTimeCSP(`${solveCSPTime.toFixed(4)}s`)
