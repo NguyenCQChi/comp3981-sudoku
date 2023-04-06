@@ -51,37 +51,42 @@ const OneSolution = (props: any) => {
     const payload = {
       value: initialBoard
     }
-    let startTime = performance.now()
-
-    try {
-      const result = await fetchWithTimeout('/api/brute_force', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload),
-        timeout: 300000
-      })
-      const status = await result.status
-      if(status == 200) {
-        changeStatusBF("Solved Brute Force!")
-      } else {
-        changeStatusBF("Cannot solve Brute Force!")
+    var solveBFTime = 0
+    var boardIsComplete = false;
+    let i = 0;
+    while (!boardIsComplete && i < 5) {
+      i++
+      let startTime = performance.now()
+      try{
+        const result = await fetchWithTimeout('/api/brute_force', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          timeout: 300000
+        })
+        const status = await result.status
+        
+        if(status == 200) {
+          boardIsComplete = true
+          changeStatusBF("Solved Brute Force!")
+        } else {
+          boardIsComplete = false
+          changeStatusBF("Cannot solve Brute Force!")
+        }
+        const value = await result.json()
+        console.log(value)
+        setGridBoard(value.board)
+        changeResultBF(value.board)
+      } catch (error : any) {
+        console.log(error.name == 'AbortError');
       }
-      const value = await result.json()
-      console.log(value)
-      setGridBoard(value.board)
-      changeResultBF(value.board)
-      console.log("initial board after calling api")
-      console.log(initialBoard)
-    } catch (error : any) {
-      console.log(error.name == 'AbortError');
+      
+      let endTime = performance.now()
+      solveBFTime = (endTime - startTime)/1000      
     }
-    
-    let endTime = performance.now()
-    let solveBFTime = (endTime - startTime)/1000
-    
     setLoading(false)
     changeTimeBF(`${solveBFTime.toFixed(4)}s`)
   }
@@ -92,39 +97,53 @@ const OneSolution = (props: any) => {
     const payload = {
       value: initialBoard
     }
-
-    let startTime = performance.now()
-    try {
-      const result = await fetchWithTimeout('/api/csp', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload),
-        timeout: 300000
-      })
-      console.log(result)
-      const status = await result.status
-      if(status == 200) {
-        changeStatusCSP("Solved CSP!")
-      } else {
-        changeStatusCSP("Cannot solve CSP!")
+    var solveCSPTime = 0
+    var boardIsComplete = false;
+    let i = 0;
+    while (!boardIsComplete && i < 10) {
+      console.log("solving " + i + " times")
+      i++
+      let startTime = performance.now()
+      try {
+        const result = await fetchWithTimeout('/api/csp', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          timeout: 300000
+        })
+        console.log(result)
+        const status = await result.status
+        if(status == 200) {
+          boardIsComplete = true
+          changeStatusCSP("Solved CSP!")
+        } else {
+          boardIsComplete = false
+          changeStatusCSP("Cannot solve CSP!")
+        }
+        const value = await result.json()
+        console.log(value)
+        setGridBoard(value.board)
+        changeResultCSP(value.board)
+        console.log("initial board after calling api")
+        console.log(initialBoard)
+      } catch (error: any) {
+        console.log(error.name == 'AbortError');
       }
-      const value = await result.json()
-      console.log(value)
-      setGridBoard(value.board)
-      changeResultCSP(value.board)
-      console.log("initial board after calling api")
-      console.log(initialBoard)
-    } catch (error: any) {
-      console.log(error.name == 'AbortError');
+      const endTime = performance.now()
+      solveCSPTime = (endTime - startTime)/1000
     }
-    const endTime = performance.now()
-    let solveCSPTime = (endTime - startTime)/1000
-
     setLoading(false)
     changeTimeCSP(`${solveCSPTime.toFixed(4)}s`)
+  }
+
+  const handleClear = () => {
+    changeResultBF([])
+    changeResultCSP([])
+    changeStatusBF("Cannot solve BF!")
+    changeStatusCSP("Cannot solve CSP!")
   }
 
   useEffect(() => {
@@ -176,7 +195,7 @@ const OneSolution = (props: any) => {
             }
             <Link href='/'>
               <a style={{textDecoration: 'none'}}>
-                <MainButton title='Clear' option={false}/>
+                <MainButton title='Clear' option={false} handleOnClick={handleClear}/>
               </a>
             </Link>
             <Link href='/exit'>

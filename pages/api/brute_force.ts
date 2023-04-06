@@ -10,6 +10,18 @@ export default function handler(req: any, res: any) {
   }
 }
 
+//checks if board is complete (aka if there is something assigned in every cell)
+const isBoardComplete = (board: any) => {
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board.length; j++) {
+      if (board[i][j] == 0) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
 const stackBruteForce = (board: any) => {
   let stack = []
   for (let i = 0; i < board.length; i++) {
@@ -20,7 +32,7 @@ const stackBruteForce = (board: any) => {
     }
   }
   dfsStack(board, stack)
-  return true
+  return isBoardComplete(board)
 }
 
 // let startRow = Math.floor(i / Math.ceil(Math.sqrt(sudokuBoard.length))) * Math.sqrt(sudokuBoard.length)

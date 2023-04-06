@@ -10,7 +10,14 @@ const TwoSolutions = ({size}: {size: String}) => {
     resultCSP, 
     initialBoard,
     timeBF, 
-    timeCSP, statusBF, statusCSP} = useContext(ResultContext);
+    timeCSP, 
+    statusBF, 
+    statusCSP,
+    changeResultBF,
+    changeResultCSP,
+    changeStatusBF,
+    changeStatusCSP
+  } = useContext(ResultContext);
   const [sizeState, setSizeState] = useState<boolean>();
   const [BFBoard, setBFBoard] = useState<string[][]>(resultBF.length > 0 ? resultBF : initialBoard);
   const [CSPBoard, setCSPBoard] = useState<string[][]>(resultCSP.length > 0 ? resultCSP : initialBoard);
@@ -51,6 +58,13 @@ const TwoSolutions = ({size}: {size: String}) => {
     }
   }, [resultCSP])
 
+  const handleClear = () =>{
+    changeResultBF([])
+    changeResultCSP([])
+    changeStatusBF("Cannot solve BF!")
+    changeStatusCSP("Cannot solve CSP!")
+  }
+
   return(
     <div style={{background: `linear-gradient(135deg, white, ${theme.palette.secondary.light} 50%, white)`, height: sizeState ? '100vh' : 'wrapContent'}}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', height: '100%', alignItems: 'center'}}>
@@ -71,7 +85,7 @@ const TwoSolutions = ({size}: {size: String}) => {
           <MainButton title ='Solve CSP' option={false} disable={true}/>
           <Link href='/'>
             <a style={{textDecoration: 'none'}}>
-              <MainButton title='Clear' option={false}/>
+              <MainButton title='Clear' option={false} handleOnClick={handleClear}/>
             </a>
           </Link>
           <Link href='/exit'>
